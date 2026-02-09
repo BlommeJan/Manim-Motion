@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+*.local
+
+# Build / cache
+dist/
+.vite/
+*.log
+.DS_Store

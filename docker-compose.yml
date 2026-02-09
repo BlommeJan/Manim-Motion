@@ -1,0 +1,64 @@
+services:
+  # Init service to create directories with correct permissions
+  init:
+    image: alpine:3.19
+    volumes:
+      - studio_data:/data
+    command: >
+      sh -c "mkdir -p /data/projects /data/assets /data/renders && 
+             chmod -R 777 /data && 
+             echo 'Data directories initialized'"
+    restart: "no"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  api:
+    build: ./services/api
+    environment:
+      - NODE_ENV=development
+      - DATA_DIR=/data
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+    volumes:
+      - studio_data:/data
+    ports:
+      - "3000:3000"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  renderer:
+    build: ./services/renderer
+    environment:
+      - DATA_DIR=/data
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - studio_data:/data
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  web:
+    build: ./services/web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  studio_data:
+  redis_data:

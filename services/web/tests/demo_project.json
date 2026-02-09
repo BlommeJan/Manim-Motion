@@ -1,0 +1,114 @@
+{
+  "id": "demo_1",
+  "name": "Demo: Heart to Square Transform",
+  "stage": {
+    "width": 1920,
+    "height": 1080,
+    "backgroundColor": "#000000",
+    "gridVisible": true,
+    "gridSize": 5,
+    "snapEnabled": true,
+    "snapToGrid": true,
+    "snapToCenter": true
+  },
+  "objects": [
+    {
+      "id": "obj_heart",
+      "type": "heart",
+      "name": "Heart 1",
+      "x": 700,
+      "y": 540,
+      "width": 120,
+      "height": 120,
+      "rotation": 0,
+      "fill": "#e91e63",
+      "stroke": "#ffffff",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "zOrder": 0,
+      "visible": true
+    },
+    {
+      "id": "obj_square",
+      "type": "square",
+      "name": "Square 1",
+      "x": 1220,
+      "y": 540,
+      "width": 120,
+      "height": 120,
+      "rotation": 0,
+      "fill": "#2196f3",
+      "stroke": "#ffffff",
+      "strokeWidth": 2,
+      "opacity": 1,
+      "zOrder": 1,
+      "visible": true
+    },
+    {
+      "id": "obj_dotgrid",
+      "type": "dot_grid",
+      "name": "5x5 Grid",
+      "x": 960,
+      "y": 540,
+      "width": 200,
+      "height": 200,
+      "rotation": 0,
+      "fill": "#ffffff",
+      "stroke": "transparent",
+      "strokeWidth": 0,
+      "opacity": 0.6,
+      "zOrder": 2,
+      "visible": true,
+      "gridCols": 5,
+      "gridRows": 5,
+      "dotRadius": 4,
+      "dotSpacing": 40
+    }
+  ],
+  "tracks": [
+    {
+      "id": "track_1",
+      "name": "Track 1",
+      "clips": [
+        {
+          "id": "clip_transform_1",
+          "type": "transform",
+          "startTime": 1.0,
+          "duration": 2.0,
+          "easing": "ease_in_out_cubic",
+          "sourceId": "obj_heart",
+          "targetId": "obj_square",
+          "params": {},
+          "overshoot": 0.04,
+          "settle": 1.0,
+          "morphQuality": "medium"
+        }
+      ]
+    },
+    {
+      "id": "track_2",
+      "name": "Track 2",
+      "clips": [
+        {
+          "id": "clip_fade_1",
+          "type": "fade",
+          "startTime": 0.5,
+          "duration": 1.5,
+          "easing": "ease_in_out",
+          "sourceId": "obj_dotgrid",
+          "targetId": null,
+          "params": {
+            "targetOpacity": 1.0
+          },
+          "overshoot": 0,
+          "settle": 1.0,
+          "morphQuality": "medium"
+        }
+      ]
+    },
+    { "id": "track_3", "name": "Track 3", "clips": [] },
+    { "id": "track_4", "name": "Track 4", "clips": [] },
+    { "id": "track_5", "name": "Track 5", "clips": [] }
+  ],
+  "sceneDuration": 10
+}

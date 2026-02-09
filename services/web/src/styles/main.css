@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0a0a0f;
+  color: #e2e8f0;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  user-select: none;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #12121a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e2e3e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3e3e4e;
+}
+
+/* ── Panel styling ── */
+.panel {
+  @apply bg-studio-surface border border-studio-border rounded-lg;
+}
+.panel-header {
+  @apply px-4 py-2.5 border-b border-studio-border font-medium text-xs uppercase tracking-wider text-studio-text-muted;
+}
+
+/* ── Buttons ── */
+.btn {
+  @apply px-3 py-1.5 rounded-md font-medium transition-colors duration-150 text-sm;
+}
+.btn-primary {
+  @apply bg-studio-accent hover:bg-studio-accent-hover text-white;
+}
+.btn-secondary {
+  @apply bg-studio-border hover:bg-opacity-80 text-studio-text;
+}
+.btn-ghost {
+  @apply bg-transparent hover:bg-studio-border text-studio-text-muted hover:text-studio-text;
+}
+.btn-danger {
+  @apply bg-studio-error/20 hover:bg-studio-error/30 text-studio-error;
+}
+.btn-xs {
+  @apply px-2 py-1 text-xs;
+}
+
+/* ── Inputs ── */
+.input {
+  @apply w-full px-2.5 py-1.5 bg-studio-bg border border-studio-border rounded-md text-studio-text text-sm;
+  @apply focus:outline-none focus:border-studio-accent focus:ring-1 focus:ring-studio-accent;
+}
+.input-sm {
+  @apply px-2 py-1 text-xs;
+}
+
+.select {
+  @apply w-full px-2.5 py-1.5 bg-studio-bg border border-studio-border rounded-md text-studio-text text-sm;
+  @apply focus:outline-none focus:border-studio-accent;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.4rem center;
+  background-size: 1.2em 1.2em;
+  padding-right: 2rem;
+}
+
+/* ── Color Swatch Input ── */
+.color-input {
+  @apply w-8 h-8 rounded border border-studio-border cursor-pointer;
+  -webkit-appearance: none;
+  padding: 0;
+}
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+.color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* ── Tool Button ── */
+.tool-btn {
+  @apply w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-100;
+  @apply text-studio-text-muted hover:text-studio-text hover:bg-studio-border;
+}
+.tool-btn.active {
+  @apply bg-studio-accent text-white;
+}
+.tool-btn.shape-btn {
+  @apply w-10 h-10;
+}
+.tool-btn.shape-btn:hover {
+  @apply bg-studio-accent/20 text-studio-accent;
+}
+
+/* ── Timeline-specific ── */
+.timeline-clip {
+  @apply absolute top-1 bottom-1 rounded-md cursor-pointer transition-shadow;
+}
+.timeline-clip:hover {
+  @apply shadow-lg;
+}
+.timeline-clip.selected {
+  @apply ring-2 ring-white/80 ring-offset-1 ring-offset-studio-bg;
+}
+
+/* ── Tooltip ── */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  @apply absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-studio-bg border border-studio-border rounded text-xs text-studio-text whitespace-nowrap opacity-0 pointer-events-none transition-opacity;
+  z-index: 100;
+}
+[data-tooltip]:hover::after {
+  @apply opacity-100;
+}
+
+/* ── Animations ── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 8px 2px rgba(99, 102, 241, 0.2); }
+}
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
