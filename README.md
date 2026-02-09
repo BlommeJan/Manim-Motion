@@ -309,6 +309,20 @@ npm test
 
 ---
 
+## Documentation
+
+For complete technical documentation of the entire codebase, see **[XTRA-BIG-README.md](XTRA-BIG-README.md)** which includes:
+- Detailed architecture diagrams
+- Complete API reference with examples
+- Data models and TypeScript interfaces
+- File-by-file breakdown of all 51 source files
+- Component documentation
+- Animation engine internals
+- Compiler pipeline details
+- Development guide and troubleshooting
+
+---
+
 ## License
 
 MIT
