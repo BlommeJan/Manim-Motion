@@ -7,8 +7,21 @@
 import { Router } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
+
+// Rate limiting: max 5 render requests per minute per IP
+const renderRateLimit = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5,
+  message: { error: 'Too many render requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Apply rate limiting to all render routes
+router.use(renderRateLimit);
 
 /**
  * Get the latest render for a project.

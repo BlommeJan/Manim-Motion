@@ -17,10 +17,10 @@
   - [x] Add `healthcheck` blocks to `renderer` and `api` services (ping `/health` endpoint).
   - [x] Configure `restart_policy: on-failure` instead of `no` for resilience.
 
-- [ ] **API Security Middleware**
-  - [ ] Install `helmet` and `express-rate-limit` in `services/api`.
-  - [ ] Add rate limiting middleware to `routes/renders.js` (max 5 renders per minute per IP).
-  - [ ] Sanitize all incoming text fields in `routes/projects.js` to prevent NoSQL injection.
+- [x] **API Security Middleware**
+  - [x] Install `helmet` and `express-rate-limit` in `services/api`.
+  - [x] Add rate limiting middleware to `routes/renders.js` (max 5 renders per minute per IP).
+  - [x] Sanitize all incoming text fields in `routes/projects.js` to prevent NoSQL injection.
 
 ## Epic 2: Foolproof UI & UX Polish
 **Context:** Inputs like Hex colors are currently raw strings, prone to user error. UI elements must not overlap.

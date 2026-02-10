@@ -17,6 +17,26 @@ const router = Router();
 function getProjectsDir(dataDir)          { return path.join(dataDir, 'projects'); }
 function getProjectDir(dataDir, projectId){ return path.join(dataDir, 'projects', projectId); }
 
+/**
+ * Sanitize data to prevent NoSQL injection by removing MongoDB operators
+ * (keys starting with $) from objects
+ */
+function sanitizeNoSQL(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeNoSQL);
+  }
+  if (obj && typeof obj === 'object') {
+    const sanitized = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Skip keys starting with $ to prevent NoSQL injection
+      if (key.startsWith('$')) continue;
+      sanitized[key] = sanitizeNoSQL(value);
+    }
+    return sanitized;
+  }
+  return obj;
+}
+
 // ─── CREATE ───────────────────────────────────────────────────────────────────
 
 /**
@@ -25,7 +45,9 @@ function getProjectDir(dataDir, projectId){ return path.join(dataDir, 'projects'
  */
 router.post('/', async (req, res, next) => {
   try {
-    const { name = 'My Animation' } = req.body;
+    // Sanitize input to prevent NoSQL injection
+    const sanitizedBody = sanitizeNoSQL(req.body);
+    const { name = 'My Animation' } = sanitizedBody;
     const projectId = `proj_${uuidv4().split('-')[0]}`;
 
     const projectDir = getProjectDir(req.dataDir, projectId);
@@ -138,8 +160,11 @@ router.put('/:id', async (req, res, next) => {
     // Ensure dir exists (handles first-save after create)
     await fs.mkdir(projectDir, { recursive: true, mode: 0o777 });
 
+    // Sanitize input to prevent NoSQL injection
+    const sanitizedBody = sanitizeNoSQL(req.body);
+
     // Preserve server ID
-    const project = { ...req.body, id: req.params.id };
+    const project = { ...sanitizedBody, id: req.params.id };
 
     // Strip dataUrl from assets before persisting (they can be huge)
     if (Array.isArray(project.assets)) {

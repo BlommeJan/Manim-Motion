@@ -244,6 +244,11 @@ All Docker containers run with **least-privilege non-root users**:
 - File permissions are properly set with `--chown` flags during build
 - `/app` and `/data` directories are owned by their respective service users
 
+**API Security Hardening**:
+- **Helmet.js**: Sets security headers (Content-Security-Policy, X-Frame-Options, X-XSS-Protection, etc.) to protect against common web vulnerabilities
+- **Rate Limiting**: Render endpoints are rate-limited to 5 requests per minute per IP to prevent abuse
+- **NoSQL Injection Protection**: All incoming data is sanitized to remove MongoDB operators (keys starting with `$`) before processing
+
 ### Production-Grade Reliability
 
 - **Resource Limits**: Renderer service is capped at 2 CPUs and 4GB RAM to prevent host crashes
