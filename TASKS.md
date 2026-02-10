@@ -12,10 +12,10 @@
   - [x] Ensure file permissions for `/app` and `/data` are owned by the `node` user in the build stage.
   - [x] Verify the build still passes with `docker compose build`.
 
-- [ ] **Optimize Docker Compose & Resource Limits**
-  - [ ] Update `docker-compose.yml`: Add `deploy.resources.limits` to the `renderer` service (Limit: 2 CPUs, 4GB RAM).
-  - [ ] Add `healthcheck` blocks to `renderer` and `api` services (ping `/health` endpoint).
-  - [ ] Configure `restart_policy: on-failure` instead of `no` for resilience.
+- [x] **Optimize Docker Compose & Resource Limits**
+  - [x] Update `docker-compose.yml`: Add `deploy.resources.limits` to the `renderer` service (Limit: 2 CPUs, 4GB RAM).
+  - [x] Add `healthcheck` blocks to `renderer` and `api` services (ping `/health` endpoint).
+  - [x] Configure `restart_policy: on-failure` instead of `no` for resilience.
 
 - [ ] **API Security Middleware**
   - [ ] Install `helmet` and `express-rate-limit` in `services/api`.

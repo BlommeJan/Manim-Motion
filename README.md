@@ -244,6 +244,13 @@ All Docker containers run with **least-privilege non-root users**:
 - File permissions are properly set with `--chown` flags during build
 - `/app` and `/data` directories are owned by their respective service users
 
+### Production-Grade Reliability
+
+- **Resource Limits**: Renderer service is capped at 2 CPUs and 4GB RAM to prevent host crashes
+- **Health Checks**: All services have configured healthchecks (API pings `/health`, renderer checks Python runtime)
+- **Auto-Restart**: Services automatically restart on failure with exponential backoff
+- **Service Dependencies**: Proper startup order ensures database and data directories exist before app starts
+
 ### Render Quality
 
 | Quality | Flag | Resolution | FPS |
