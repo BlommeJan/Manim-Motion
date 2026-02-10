@@ -12,10 +12,10 @@
         </div>
         <div>
           <label class="block text-xs text-studio-text-muted mb-1">Color</label>
-          <div class="flex items-center gap-2">
-            <input type="color" :value="element.style.color" @input="updateStyle('color', $event.target.value)" class="w-8 h-8 rounded cursor-pointer" />
-            <input type="text" :value="element.style.color" @input="updateStyle('color', $event.target.value)" class="input text-sm flex-1" />
-          </div>
+          <ColorInput 
+            :value="element.style.color" 
+            @change="updateStyle('color', $event)" 
+          />
         </div>
       </div>
     </template>
@@ -34,11 +34,17 @@
       <div class="grid grid-cols-2 gap-3 mb-3">
         <div>
           <label class="block text-xs text-studio-text-muted mb-1">Stroke</label>
-          <input type="color" :value="element.style.strokeColor || '#ffffff'" @input="updateStyle('strokeColor', $event.target.value)" class="w-8 h-8 rounded cursor-pointer" />
+          <ColorInput 
+            :value="element.style.strokeColor || '#ffffff'" 
+            @change="updateStyle('strokeColor', $event)" 
+          />
         </div>
         <div>
           <label class="block text-xs text-studio-text-muted mb-1">Fill</label>
-          <input type="color" :value="element.style.fillColor || '#ffffff'" @input="updateStyle('fillColor', $event.target.value)" class="w-8 h-8 rounded cursor-pointer" />
+          <ColorInput 
+            :value="element.style.fillColor || '#ffffff'" 
+            @change="updateStyle('fillColor', $event)" 
+          />
         </div>
       </div>
     </template>
@@ -46,8 +52,11 @@
 </template>
 
 <script>
+import ColorInput from './ColorInput.vue';
+
 export default {
   name: 'StylePanel',
+  components: { ColorInput },
   props: { element: { type: Object, required: true } },
   methods: {
     updateStyle(key, value) {

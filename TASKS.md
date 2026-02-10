@@ -25,10 +25,10 @@
 ## Epic 2: Foolproof UI & UX Polish
 **Context:** Inputs like Hex colors are currently raw strings, prone to user error. UI elements must not overlap.
 
-- [ ] **Harden Style Panel Inputs**
-  - [ ] Refactor `services/web/src/components/inspector/StylePanel.vue`: Replace standard `<input type="text">` for colors with a custom wrapper component.
-  - [ ] Implement a strict Regex validator (`/^#[0-9A-F]{6}$/i`) that rejects invalid Hex codes instantly.
-  - [ ] Add a native `<input type="color">` picker alongside the hex field for foolproof selection.
+- [x] **Harden Style Panel Inputs**
+  - [x] Refactor `services/web/src/components/inspector/StylePanel.vue`: Replace standard `<input type="text">` for colors with a custom wrapper component.
+  - [x] Implement a strict Regex validator (`/^#[0-9A-F]{6}$/i`) that rejects invalid Hex codes instantly.
+  - [x] Add a native `<input type="color">` picker alongside the hex field for foolproof selection.
 
 - [ ] **Fix Layout & Z-Index Layering**
   - [ ] Audit `services/web/src/styles/main.css` and `App.vue`: Define a global z-index scale (e.g., `--z-stage: 10`, `--z-overlay: 100`, `--z-modal: 1000`).

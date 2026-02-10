@@ -37,6 +37,7 @@
 - **Visual Stage Editor** -- Black canvas with optional grid, drag-and-drop shapes, resize/rotate handles, multi-select
 - **Shape Library** -- Heart, Square, Circle, Dot, 5x5 Dot Grid, plus uploaded images and SVGs
 - **Transform Morphing** -- Select two shapes and morph between them with customizable easing
+- **Validated Color Inputs** -- Dual color picker (native + hex) with strict regex validation (`/^#[0-9A-F]{6}$/i`) to prevent invalid hex codes
 - **Multi-Track Timeline** -- Up to 5 tracks with draggable, resizable animation clips
 - **Real-Time Preview** -- 60fps playback with sub-frame interpolation
 - **Animation Types** -- Transform, Move, Scale, Fade, Rotate with 17 easing functions
