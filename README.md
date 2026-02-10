@@ -230,11 +230,19 @@ Manim-docker/
 
 | Service | Image | Port | Purpose |
 |---------|-------|------|---------|
-| **web** | nginx:alpine | 8080 | Vue SPA + API proxy |
-| **api** | node:20-alpine | 3000 | REST API, compiler |
+| **web** | nginx:alpine | 8080 | Vue SPA + API proxy (runs as non-root `nginx` user) |
+| **api** | node:20-alpine | 3000 | REST API, compiler (runs as non-root `node` user) |
 | **renderer** | manimcommunity/manim | -- | Render worker |
 | **redis** | redis:7-alpine | 6379 | Job queue |
 | **init** | alpine:3.19 | -- | Creates /data dirs |
+
+### Security
+
+All Docker containers run with **least-privilege non-root users**:
+- **web** service runs as `nginx` user (UID 1000)
+- **api** service runs as `node` user (UID 1000)
+- File permissions are properly set with `--chown` flags during build
+- `/app` and `/data` directories are owned by their respective service users
 
 ### Render Quality
 
