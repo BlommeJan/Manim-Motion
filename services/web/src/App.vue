@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="h-screen bg-studio-bg text-studio-text flex flex-col overflow-hidden">
+  <div id="app" class="h-screen bg-studio-bg text-studio-text flex flex-col overflow-hidden" style="z-index: var(--z-stage);">
     <!-- Top Bar -->
     <Topbar />
 
@@ -83,7 +83,7 @@
     <!-- Export Dialog (client-side .py download) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <transition name="fade">
-      <div v-if="showExport" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" @click.self="closeExport">
+      <div v-if="showExport" class="fixed inset-0 bg-black/60 flex items-center justify-center" style="z-index: var(--z-modal);" @click.self="closeExport">
         <div class="bg-studio-surface border border-studio-border rounded-xl w-[700px] max-h-[80vh] flex flex-col shadow-2xl">
           <div class="px-5 py-4 border-b border-studio-border flex items-center justify-between">
             <div>
@@ -123,7 +123,7 @@
     <!-- Server Render Dialog -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <transition name="fade">
-      <div v-if="showRender" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" @click.self="closeRender">
+      <div v-if="showRender" class="fixed inset-0 bg-black/60 flex items-center justify-center" style="z-index: var(--z-modal);" @click.self="closeRender">
         <div class="bg-studio-surface border border-studio-border rounded-xl w-[540px] max-h-[85vh] flex flex-col shadow-2xl">
           <!-- Header -->
           <div class="px-5 py-4 border-b border-studio-border flex items-center justify-between">
@@ -210,7 +210,7 @@
     <!-- Server Project Browser -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <transition name="fade">
-      <div v-if="showProjectBrowser" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" @click.self="closeProjectBrowser">
+      <div v-if="showProjectBrowser" class="fixed inset-0 bg-black/60 flex items-center justify-center" style="z-index: var(--z-modal);" @click.self="closeProjectBrowser">
         <div class="bg-studio-surface border border-studio-border rounded-xl w-[500px] max-h-[70vh] flex flex-col shadow-2xl">
           <div class="px-5 py-4 border-b border-studio-border flex items-center justify-between">
             <div>
@@ -259,7 +259,7 @@
 
     <!-- Error Toast -->
     <transition name="slide-up">
-      <div v-if="error" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-studio-surface border border-studio-error/30 text-studio-text px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 z-50">
+      <div v-if="error" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-studio-surface border border-studio-error/30 text-studio-text px-5 py-3 rounded-xl shadow-xl flex items-center gap-3" style="z-index: var(--z-overlay);">
         <span class="text-studio-error">!</span>
         <span class="text-sm">{{ error }}</span>
         <button @click="clearError" class="text-studio-text-muted hover:text-studio-text ml-2">&times;</button>
@@ -311,6 +311,7 @@ export default {
     showExport()         { return store.showExportDialog; },
     exportCode()         { return store.exportCode; },
     hasImages()          { return store.project.objects.some(o => o.type === 'image' || o.type === 'svg_asset'); },
+    hasTextElements()    { return store.project.objects.some(o => o.type === 'text' || o.type === 'latex'); },
     showRender()         { return store.showRenderDialog; },
     renderStatus()       { return store.renderStatus; },
     renderError()        { return store.renderError; },
@@ -367,8 +368,8 @@ export default {
     handleKeydown(e) {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
 
-      if (e.key === 'v' || e.key === 'V') { actions.setActiveTool('select'); e.preventDefault(); }
-      if (e.key === 'h' || e.key === 'H') { actions.setActiveTool('hand'); e.preventDefault(); }
+      if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey) { actions.setActiveTool('select'); e.preventDefault(); }
+      if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) { actions.setActiveTool('hand'); e.preventDefault(); }
 
       if ((e.key === 'Delete' || e.key === 'Backspace') && !e.ctrlKey) {
         if (store.selectedClipId) { actions.deleteClip(store.selectedClipId); e.preventDefault(); }
@@ -382,6 +383,12 @@ export default {
       if (e.key === ' ') { this.togglePlayback(); e.preventDefault(); }
       if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); actions.saveToFile(); }
       if ((e.ctrlKey || e.metaKey) && e.key === 'g') { e.preventDefault(); if (store.selectedObjectIds.length >= 2) actions.groupObjects([...store.selectedObjectIds]); }
+
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); actions.undo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) { e.preventDefault(); actions.redo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); actions.redo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c') { e.preventDefault(); actions.copySelection(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v') { e.preventDefault(); actions.pasteSelection(); }
     },
 
     togglePlayback() {

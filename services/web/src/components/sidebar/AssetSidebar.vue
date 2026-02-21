@@ -157,6 +157,8 @@ export default {
         { type: 'line',      label: 'Line',      color: '#94a3b8', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="4" y1="20" x2="20" y2="4"/></svg>' },
         { type: 'dot',       label: 'Dot',       color: '#94a3b8', icon: '<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg>' },
         { type: 'dot_grid',  label: '5x5 Grid',  color: '#a855f7', icon: '<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2" fill="currentColor"/><circle cx="12" cy="5" r="2" fill="currentColor"/><circle cx="19" cy="5" r="2" fill="currentColor"/><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/><circle cx="5" cy="19" r="2" fill="currentColor"/><circle cx="12" cy="19" r="2" fill="currentColor"/><circle cx="19" cy="19" r="2" fill="currentColor"/></svg>' },
+        { type: 'latex',     label: 'LaTeX',     color: '#a855f7', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><text x="4" y="18" font-size="16" font-style="italic" fill="currentColor" stroke="none">fx</text></svg>' },
+        { type: 'axes',      label: 'Axes',      color: '#10b981', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="20" x2="3" y2="4"/><line x1="3" y1="20" x2="20" y2="20"/><polyline points="3 4 1 6 3 4 5 6"/><polyline points="20 20 18 18 20 20 18 22"/></svg>' },
       ]
     };
   },

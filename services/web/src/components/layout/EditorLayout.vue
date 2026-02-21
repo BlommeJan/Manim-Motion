@@ -1,5 +1,5 @@
 <template>
-  <div class="editor-layout h-full flex flex-col">
+  <div class="editor-layout h-full flex flex-col overflow-hidden">
     <slot name="header"></slot>
     
     <div class="flex-1 flex overflow-hidden">

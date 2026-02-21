@@ -3,50 +3,65 @@
   
   # Manim Motion Editor
   
-  A **Figma-like interactive motion editor** with **high-quality Manim rendering** via Docker. Build animations visually: drag shapes onto a stage, create transform morphs between objects, edit timelines with multiple tracks, preview at 60fps, and render cinematic HQ videos -- all from your browser.
+  **A Figma-like visual animation editor powered by Manim.**  
+  Build mathematical animations by dragging shapes, writing LaTeX, creating morphs, and rendering cinematic videos -- all from your browser.
 </div>
 
-![Docker](https://img.shields.io/badge/docker-ready-blue)
-![Vue](https://img.shields.io/badge/vue-2.7-green)
-![Manim](https://img.shields.io/badge/manim-CE-orange)
-![Node](https://img.shields.io/badge/node-20-brightgreen)
+<br>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/vue-2.7-4FC08D?logo=vue.js&logoColor=white" alt="Vue">
+  <img src="https://img.shields.io/badge/manim-CE-orange?logo=python&logoColor=white" alt="Manim">
+  <img src="https://img.shields.io/badge/node-20-339933?logo=node.js&logoColor=white" alt="Node">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+</p>
 
 ---
 
 ## Screenshots
 
-### Empty canvas -- clean starting state
-![Empty State](docs/screenshots/01-empty-state.png)
-
-### Shapes on stage with properties panel
-![With Shapes](docs/screenshots/02-with-shapes.png)
-
-### One-click HQ render dialog
-![Render Dialog](docs/screenshots/03-render-dialog.png)
-
-### Manim rendering in progress
-![Rendering](docs/screenshots/04-rendering.png)
-
-### Render complete with video preview + download
-![Render Complete](docs/screenshots/05-render-complete.png)
+<table>
+  <tr>
+    <td align="center"><strong>Clean canvas with shape palette</strong></td>
+    <td align="center"><strong>Objects on stage with properties panel</strong></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/01-empty-canvas.png" alt="Empty canvas" width="480"></td>
+    <td><img src="docs/screenshots/02-shapes-on-stage.png" alt="Shapes on stage" width="480"></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><strong>Live code view -- generated Manim Python updates in real time</strong></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="docs/screenshots/03-code-view.png" alt="Code view" width="720"></td>
+  </tr>
+</table>
 
 ---
 
 ## Features
 
-- **Visual Stage Editor** -- Black canvas with optional grid, drag-and-drop shapes, resize/rotate handles, multi-select
-- **Shape Library** -- Heart, Square, Circle, Dot, 5x5 Dot Grid, plus uploaded images and SVGs
-- **Transform Morphing** -- Select two shapes and morph between them with customizable easing
-- **Validated Color Inputs** -- Dual color picker (native + hex) with strict regex validation (`/^#[0-9A-F]{6}$/i`) to prevent invalid hex codes
-- **Multi-Track Timeline** -- Up to 5 tracks with draggable, resizable animation clips
-- **Real-Time Preview** -- 60fps playback with sub-frame interpolation
-- **Animation Types** -- Transform, Move, Scale, Fade, Rotate with 17 easing functions
-- **Asset Management** -- Upload PNGs, JPEGs, SVGs; drag onto stage from sidebar
-- **Server Rendering** -- One-click HQ render via Docker (480p to 4K) with progress tracking
-- **Export Options** -- Download Manim Python scripts or render server-side
-- **Project Management** -- Save/load locally (JSON) or sync to Docker server
-- **Live Code View** -- Toggle between Timeline and Code in the bottom panel to see generated Manim Python in real-time
-- **Keyboard Shortcuts** -- Space (play/pause), V (select), H (hand/pan), Delete, Ctrl+S (save)
+### Visual Editor
+- **Drag-and-drop stage** -- Black canvas with optional grid, resize/rotate handles, multi-select, snapping
+- **16 shape types** -- Rectangle, Square, Circle, Ellipse, Triangle, Star, Hexagon, Arrow, Heart, Line, Dot, 5x5 Grid, Text, Image, SVG, and more
+- **LaTeX math objects** -- Add `MathTex` expressions (e.g. `E = mc^2`) that render natively in Manim
+- **Coordinate Axes** -- Configurable `Axes` with custom x/y ranges and tick steps
+- **Asset uploads** -- Import PNGs, JPEGs, and SVGs; drag onto the canvas from the sidebar
+
+### Animation & Timeline
+- **Multi-track timeline** -- Up to 5 tracks with draggable, resizable animation clips
+- **Transform morphing** -- Select two shapes and morph between them with customizable easing
+- **Animation types** -- Transform, Move, Scale, Fade, Rotate with 17 easing functions
+- **60fps preview** -- Real-time playback with sub-frame interpolation
+- **Entrance / exit animations** -- 11 entrance and 9 exit animation presets per object
+
+### Workflow
+- **Undo / Redo** -- Full history stack (Ctrl+Z / Ctrl+Shift+Z) with 50-state memory
+- **Copy / Paste** -- Duplicate objects with offset (Ctrl+C / Ctrl+V)
+- **Live Code view** -- See generated Manim Python update in real time; copy or download `.py` directly
+- **Server rendering** -- One-click HQ render via Docker (480p to 4K) with progress tracking
+- **Project management** -- Save/load locally (JSON) or sync to Docker server
 
 ---
 
@@ -114,10 +129,10 @@ Browser (localhost:8080)
 ## How It Works
 
 ### 1. Add Shapes
-Click shapes in the left sidebar. They appear on the stage and on the timeline's Objects row.
+Click shapes in the left sidebar (including LaTeX and Axes). They appear on the stage and on the timeline.
 
 ### 2. Position and Style
-Drag shapes on the canvas. Edit fill, stroke, opacity, size, rotation in the Properties panel.
+Drag shapes on the canvas. Edit fill, stroke, opacity, size, rotation in the Properties panel. LaTeX objects have a formula editor; Axes objects have configurable ranges.
 
 ### 3. Create Animations
 - **Transform**: Select two shapes (click + Shift+click), then click "Create Transform"
@@ -135,10 +150,30 @@ Press **Space** to play the animation at 60fps. Scrub the timeline ruler to seek
 Click **Render HQ** in the top bar. Choose quality (Low/Medium/High/4K) and click Start Render. The project is saved to the server, compiled to a Manim scene, and rendered. When done, watch the preview and download the MP4.
 
 ### 7. Live Code View
-Click the **Code** tab in the bottom panel to see the generated Manim Python code update in real-time as you add shapes and animations. You can copy or download the code directly from there.
+Click the **Code** tab to see the generated Manim Python code update in real time as you add shapes and animations. Copy or download the `.py` directly.
 
 ### 8. Export
 Click **Export .py** to download a standalone `scene.py` you can run locally with `manim -qh scene.py MainScene`.
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Space` | Play / Pause |
+| `V` | Select tool |
+| `H` | Hand (pan) tool |
+| `Delete` | Delete selected object/clip |
+| `Escape` | Deselect all, close dialogs |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Shift+Z` / `Ctrl+Y` | Redo |
+| `Ctrl+C` | Copy selected objects |
+| `Ctrl+V` | Paste copied objects |
+| `Ctrl+S` | Save to file |
+| `Ctrl+G` | Group selected objects |
+| `Shift+Click` | Multi-select objects |
+| `Scroll` | Zoom canvas |
 
 ---
 
@@ -150,12 +185,15 @@ Project
  +-- stage: { width, height, backgroundColor, grid*, snap* }
  +-- objects[]: { id, type, name, x, y, width, height, rotation,
  |               fill, stroke, opacity, zOrder, enterTime, duration,
- |               enterAnim, exitAnim, assetId? }
+ |               enterAnim, exitAnim, latex?, xRange?, yRange?, assetId? }
+ +-- groups[]: { id, name, childIds[], margin, collapsed }
  +-- tracks[]: { id, name, clips[] }
  |    +-- clip: { id, type, startTime, duration, easing,
  |                sourceId, targetId?, params, overshoot, morphQuality }
  +-- assets[]: { id, name, type, filename, dataUrl?, width, height }
 ```
+
+**Object types**: `rectangle`, `square`, `circle`, `ellipse`, `triangle`, `star`, `polygon`, `line`, `arrow`, `heart`, `dot`, `dot_grid`, `text`, `image`, `svg_asset`, `latex`, `axes`
 
 **Clip types**: `transform` (morph A->B), `move`, `scale`, `fade`, `rotate`
 
@@ -192,7 +230,7 @@ Manim-docker/
     |   +-- src/
     |   |   +-- App.vue               # Root: dialogs, shortcuts
     |   |   +-- api.js                # API client
-    |   |   +-- store/project.js      # State + server actions
+    |   |   +-- store/project.js      # State, history, clipboard
     |   |   +-- engine/               # Playback engine
     |   |   |   +-- geometry.js       # Shape point generation
     |   |   |   +-- easing.js         # 17 easing functions
@@ -231,8 +269,8 @@ Manim-docker/
 
 | Service | Image | Port | Purpose |
 |---------|-------|------|---------|
-| **web** | nginx:alpine | 8080 | Vue SPA + API proxy (runs as non-root `nginx` user) |
-| **api** | node:20-alpine | 3000 | REST API, compiler (runs as non-root `node` user) |
+| **web** | nginx:alpine | 8080 | Vue SPA + API proxy |
+| **api** | node:20-alpine | 3000 | REST API, compiler |
 | **renderer** | manimcommunity/manim | -- | Render worker |
 | **redis** | redis:7-alpine | 6379 | Job queue |
 | **init** | alpine:3.19 | -- | Creates /data dirs |
@@ -240,22 +278,11 @@ Manim-docker/
 ### Security
 
 All Docker containers run with **least-privilege non-root users**:
-- **web** service runs as `nginx` user (UID 1000)
-- **api** service runs as `node` user (UID 1000)
-- File permissions are properly set with `--chown` flags during build
-- `/app` and `/data` directories are owned by their respective service users
+- **web** runs as `nginx` user (UID 1000)
+- **api** runs as `node` user (UID 1000)
+- File permissions set with `--chown` flags during build
 
-**API Security Hardening**:
-- **Helmet.js**: Sets security headers (Content-Security-Policy, X-Frame-Options, X-XSS-Protection, etc.) to protect against common web vulnerabilities
-- **Rate Limiting**: Render endpoints are rate-limited to 5 requests per minute per IP to prevent abuse
-- **NoSQL Injection Protection**: All incoming data is sanitized to remove MongoDB operators (keys starting with `$`) before processing
-
-### Production-Grade Reliability
-
-- **Resource Limits**: Renderer service is capped at 2 CPUs and 4GB RAM to prevent host crashes
-- **Health Checks**: All services have configured healthchecks (API pings `/health`, renderer checks Python runtime)
-- **Auto-Restart**: Services automatically restart on failure with exponential backoff
-- **Service Dependencies**: Proper startup order ensures database and data directories exist before app starts
+**API hardening**: Helmet.js security headers, rate limiting on render endpoints (5 req/min/IP), input sanitization against injection.
 
 ### Render Quality
 
@@ -287,37 +314,12 @@ npm test
 
 ## Troubleshooting
 
-**Render fails?**
-- Check `docker compose logs renderer` for Manim errors
-- Ensure all services are running: `docker compose ps`
-
-**API not reachable?**
-- `curl http://localhost:3000/health` should return `{"status":"ok"}`
-- Check `docker compose logs api`
-
-**Images not loading?**
-- Upload images via the sidebar (they're stored as base64 in the browser)
-- When rendering, assets are automatically synced to the server
-
-**Playback stutters?**
-- Reduce morph quality in clip properties
-- Close browser DevTools
-- Use Chrome/Edge for best V8 performance
-
----
-
-## Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| `Space` | Play / Pause |
-| `V` | Select tool |
-| `H` | Hand (pan) tool |
-| `Delete` | Delete selected object/clip |
-| `Escape` | Deselect all, close dialogs |
-| `Ctrl+S` | Save to file |
-| `Shift+Click` | Multi-select objects |
-| `Scroll` | Zoom canvas |
+| Problem | Solution |
+|---------|----------|
+| **Render fails** | Check `docker compose logs renderer` for Manim errors. Ensure all services are running: `docker compose ps` |
+| **API not reachable** | Run `curl http://localhost:3000/health` -- should return `{"status":"ok"}`. Check `docker compose logs api` |
+| **Images not loading** | Upload via the sidebar (stored as base64). Assets auto-sync to server on render |
+| **Playback stutters** | Reduce morph quality in clip properties. Close DevTools. Use Chrome/Edge for best performance |
 
 ---
 
@@ -332,15 +334,7 @@ npm test
 
 ## Documentation
 
-For complete technical documentation of the entire codebase, see **[XTRA-BIG-README.md](XTRA-BIG-README.md)** which includes:
-- Detailed architecture diagrams
-- Complete API reference with examples
-- Data models and TypeScript interfaces
-- File-by-file breakdown of all 51 source files
-- Component documentation
-- Animation engine internals
-- Compiler pipeline details
-- Development guide and troubleshooting
+For detailed technical docs of the entire codebase, see **[XTRA-BIG-README.md](XTRA-BIG-README.md)** -- includes architecture diagrams, complete API reference, data models, file-by-file breakdown, animation engine internals, compiler pipeline details, and development guide.
 
 ---
 

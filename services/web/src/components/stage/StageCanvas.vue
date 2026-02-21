@@ -62,6 +62,26 @@
 
             <!-- Image / SVG -->
             <v-image v-if="(obj.type === 'image' || obj.type === 'svg_asset') && isVis(obj.id) && imageElements[obj.assetId]" :key="obj.id" :config="imageCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+
+            <!-- LaTeX -->
+            <v-group v-if="obj.type === 'latex' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)">
+              <v-rect :config="latexBgCfg(obj)" />
+              <v-text :config="latexTextCfg(obj)" />
+              <v-text :config="latexBadgeCfg(obj)" />
+            </v-group>
+
+            <!-- Axes -->
+            <v-group v-if="obj.type === 'axes' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)">
+              <v-rect :config="axesBgCfg(obj)" />
+              <v-line :config="axesXLineCfg(obj)" />
+              <v-line :config="axesYLineCfg(obj)" />
+              <v-line :config="axesXArrowCfg(obj)" />
+              <v-line :config="axesYArrowCfg(obj)" />
+              <v-line v-for="(tick, ti) in axesXTicks(obj)" :key="'xt'+ti" :config="tick" />
+              <v-line v-for="(tick, ti) in axesYTicks(obj)" :key="'yt'+ti" :config="tick" />
+              <v-text :config="axesLabelCfg(obj, 'x')" />
+              <v-text :config="axesLabelCfg(obj, 'y')" />
+            </v-group>
           </template>
         </v-layer>
 
@@ -82,7 +102,7 @@
       </v-stage>
 
       <!-- Drop zone indicator -->
-      <div v-if="isDraggingOver" class="absolute inset-0 pointer-events-none z-10 border-2 border-dashed border-studio-accent/50 rounded-xl bg-studio-accent/5 flex items-center justify-center">
+      <div v-if="isDraggingOver" class="absolute inset-0 pointer-events-none border-2 border-dashed border-studio-accent/50 rounded-xl bg-studio-accent/5 flex items-center justify-center" style="z-index: var(--z-overlay);">
         <span class="text-studio-accent text-sm font-medium opacity-60">Drop to place</span>
       </div>
 
@@ -454,6 +474,77 @@ export default {
         draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject'
       };
     },
+    // ── LaTeX config ──
+    latexBgCfg(obj) {
+      const w = obj.width * this.vs, h = obj.height * this.vs;
+      return { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'rgba(168,85,247,0.08)', stroke: '#a855f7', strokeWidth: 1.5, dash: [6, 4], cornerRadius: 6, listening: false };
+    },
+    latexTextCfg(obj) {
+      const w = obj.width * this.vs, h = obj.height * this.vs;
+      return { x: -w / 2, y: -h / 2, width: w, height: h, text: obj.latex || 'E = mc^2', fontSize: Math.max(12, 18 * this.vs), fontFamily: 'serif', fontStyle: 'italic', fill: obj.fill || '#ffffff', align: 'center', verticalAlign: 'middle', padding: 8, listening: false };
+    },
+    latexBadgeCfg(obj) {
+      const w = obj.width * this.vs;
+      return { x: -w / 2 + 4, y: -obj.height * this.vs / 2 + 4, text: 'TEX', fontSize: 9, fill: '#a855f7', fontFamily: 'monospace', fontStyle: 'bold', listening: false };
+    },
+
+    // ── Axes config ──
+    axesBgCfg(obj) {
+      const w = obj.width * this.vs, h = obj.height * this.vs;
+      return { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'rgba(16,185,129,0.04)', stroke: 'rgba(16,185,129,0.15)', strokeWidth: 1, cornerRadius: 4, listening: false };
+    },
+    axesXLineCfg(obj) {
+      const w = obj.width * this.vs, h = obj.height * this.vs;
+      return { points: [-w / 2 + 10, 0, w / 2 - 10, 0], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
+    },
+    axesYLineCfg(obj) {
+      const h = obj.height * this.vs;
+      return { points: [0, h / 2 - 10, 0, -h / 2 + 10], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
+    },
+    axesXArrowCfg(obj) {
+      const w = obj.width * this.vs;
+      const tip = w / 2 - 10;
+      return { points: [tip - 8, -5, tip, 0, tip - 8, 5], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
+    },
+    axesYArrowCfg(obj) {
+      const h = obj.height * this.vs;
+      const tip = -h / 2 + 10;
+      return { points: [-5, tip + 8, 0, tip, 5, tip + 8], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
+    },
+    axesXTicks(obj) {
+      const xr = obj.xRange || [-5, 5, 1];
+      const w = obj.width * this.vs;
+      const ticks = [];
+      const range = xr[1] - xr[0];
+      const step = xr[2] || 1;
+      for (let v = xr[0]; v <= xr[1]; v += step) {
+        if (Math.abs(v) < 0.001) continue;
+        const px = ((v - xr[0]) / range - 0.5) * (w - 20);
+        ticks.push({ points: [px, -4, px, 4], stroke: obj.stroke || '#ffffff', strokeWidth: 1, listening: false });
+      }
+      return ticks;
+    },
+    axesYTicks(obj) {
+      const yr = obj.yRange || [-3, 3, 1];
+      const h = obj.height * this.vs;
+      const ticks = [];
+      const range = yr[1] - yr[0];
+      const step = yr[2] || 1;
+      for (let v = yr[0]; v <= yr[1]; v += step) {
+        if (Math.abs(v) < 0.001) continue;
+        const py = -((v - yr[0]) / range - 0.5) * (h - 20);
+        ticks.push({ points: [-4, py, 4, py], stroke: obj.stroke || '#ffffff', strokeWidth: 1, listening: false });
+      }
+      return ticks;
+    },
+    axesLabelCfg(obj, axis) {
+      const w = obj.width * this.vs, h = obj.height * this.vs;
+      if (axis === 'x') {
+        return { x: w / 2 - 20, y: 6, text: 'x', fontSize: 12, fill: obj.stroke || '#ffffff', fontFamily: 'serif', fontStyle: 'italic', listening: false };
+      }
+      return { x: 6, y: -h / 2 + 12, text: 'y', fontSize: 12, fill: obj.stroke || '#ffffff', fontFamily: 'serif', fontStyle: 'italic', listening: false };
+    },
+
     morphCfg(m) {
       if (!m || !m.flatPoints || m.flatPoints.length < 4) return { points: [], closed: true };
       const p = this.s2c(m.x, m.y);

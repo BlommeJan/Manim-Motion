@@ -13,6 +13,8 @@
 import Vue from 'vue';
 import api from '../api.js';
 
+const MAX_HISTORY = 50;
+
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
 function createDefaultProject() {
@@ -84,6 +86,12 @@ export const store = Vue.observable({
 
   // API connectivity
   apiAvailable: null,    // null = unknown, true/false
+
+  // History (undo/redo)
+  history: { past: [], future: [] },
+
+  // Clipboard (copy/paste)
+  clipboard: [],
 
   // UI
   isDirty: false,
@@ -161,7 +169,9 @@ export const SHAPE_DEFAULTS = {
   dot_grid: { width: 200, height: 200, fill: '#a855f7', stroke: 'transparent', strokeWidth: 0 },
   text:     { width: 200, height: 50,  fill: '#ffffff', stroke: 'transparent', strokeWidth: 0 },
   image:    { width: 200, height: 200, fill: 'transparent', stroke: 'transparent', strokeWidth: 0 },
-  svg_asset:{ width: 200, height: 200, fill: 'transparent', stroke: 'transparent', strokeWidth: 0 }
+  svg_asset:{ width: 200, height: 200, fill: 'transparent', stroke: 'transparent', strokeWidth: 0 },
+  latex:    { width: 200, height: 80,  fill: '#ffffff', stroke: 'transparent', strokeWidth: 0 },
+  axes:     { width: 400, height: 300, fill: '#ffffff', stroke: '#ffffff', strokeWidth: 2 }
 };
 
 export const SHAPE_COLORS = {
@@ -169,7 +179,8 @@ export const SHAPE_COLORS = {
   triangle: '#f59e0b', star: '#eab308', polygon: '#8b5cf6',
   line: '#94a3b8', arrow: '#ef4444',
   heart: '#ec4899', dot: '#94a3b8', dot_grid: '#a855f7',
-  text: '#f472b6', image: '#f59e0b', svg_asset: '#f59e0b'
+  text: '#f472b6', image: '#f59e0b', svg_asset: '#f59e0b',
+  latex: '#a855f7', axes: '#10b981'
 };
 
 // ─── Getters ─────────────────────────────────────────────────────────────────
@@ -253,7 +264,8 @@ export const actions = {
     const nameMap = {
       dot_grid: 'Dot Grid', svg_asset: 'SVG', rectangle: 'Rectangle',
       ellipse: 'Ellipse', triangle: 'Triangle', star: 'Star',
-      polygon: 'Polygon', line: 'Line', arrow: 'Arrow', text: 'Text'
+      polygon: 'Polygon', line: 'Line', arrow: 'Arrow', text: 'Text',
+      latex: 'LaTeX', axes: 'Axes'
     };
     const displayName = nameMap[type] || (type.charAt(0).toUpperCase() + type.slice(1));
 
@@ -282,11 +294,14 @@ export const actions = {
       ...(type === 'text' ? { content: 'Hello World', fontSize: 48, fontFamily: 'Roboto', textAlign: 'center', fontWeight: 'normal', fontStyle: 'normal' } : {}),
       ...(type === 'polygon' ? { sides: 6 } : {}),
       ...(type === 'star' ? { starArms: 5, innerRatio: 0.4 } : {}),
+      ...(type === 'latex' ? { latex: 'E = mc^2' } : {}),
+      ...(type === 'axes' ? { xRange: [-5, 5, 1], yRange: [-3, 3, 1] } : {}),
       ...extraProps
     };
 
     store.project.objects.push(obj);
     store.isDirty = true;
+    actions.commitState();
     return obj;
   },
 
@@ -316,6 +331,7 @@ export const actions = {
       Vue.set(obj, key, updates[key]);
     }
     store.isDirty = true;
+    actions._debouncedCommit();
   },
 
   deleteObject(id) {
@@ -337,6 +353,7 @@ export const actions = {
       store.project.groups = store.project.groups.filter(g => g.childIds && g.childIds.length > 0);
     }
     store.isDirty = true;
+    actions.commitState();
   },
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -365,6 +382,7 @@ export const actions = {
     };
     store.project.groups.push(group);
     store.isDirty = true;
+    actions.commitState();
     return group;
   },
 
@@ -374,6 +392,7 @@ export const actions = {
     if (idx !== -1) {
       store.project.groups.splice(idx, 1);
       store.isDirty = true;
+      actions.commitState();
     }
   },
 
@@ -481,6 +500,7 @@ export const actions = {
     };
     store.project.tracks[trackIndex].clips.push(clip);
     store.isDirty = true;
+    actions.commitState();
     return clip;
   },
 
@@ -502,6 +522,7 @@ export const actions = {
         track.clips.splice(idx, 1);
         if (store.selectedClipId === clipId) store.selectedClipId = null;
         store.isDirty = true;
+        actions.commitState();
         return;
       }
     }
@@ -620,6 +641,9 @@ export const actions = {
       store.selectedClipId = null;
       store.isDirty = false;
       store.error = null;
+      store.history.past = [];
+      store.history.future = [];
+      actions.commitState();
       return true;
     } catch (err) {
       store.error = `Could not open project: ${err.message}`;
@@ -671,6 +695,9 @@ export const actions = {
     store.renderError = null;
     store.renderVideoUrl = null;
     store.renderLog = '';
+    store.history.past = [];
+    store.history.future = [];
+    store.clipboard = [];
     _objectAddCount = 0;
   },
 
@@ -877,6 +904,91 @@ export const actions = {
       clearInterval(_pollTimer);
       _pollTimer = null;
     }
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // History (Undo / Redo)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  _snapshotState() {
+    return JSON.stringify({
+      objects: store.project.objects,
+      groups: store.project.groups,
+      tracks: store.project.tracks
+    });
+  },
+
+  commitState() {
+    const snapshot = actions._snapshotState();
+    store.history.past.push(snapshot);
+    if (store.history.past.length > MAX_HISTORY) store.history.past.shift();
+    store.history.future = [];
+  },
+
+  _debouncedCommit: (() => {
+    let timer = null;
+    return () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => actions.commitState(), 400);
+    };
+  })(),
+
+  undo() {
+    if (store.history.past.length <= 1) return;
+    const current = store.history.past.pop();
+    store.history.future.push(current);
+    const prev = store.history.past[store.history.past.length - 1];
+    const data = JSON.parse(prev);
+    store.project.objects = data.objects;
+    store.project.groups = data.groups || [];
+    store.project.tracks = data.tracks;
+    store.selectedObjectIds = [];
+    store.selectedClipId = null;
+    store.isDirty = true;
+  },
+
+  redo() {
+    if (store.history.future.length === 0) return;
+    const next = store.history.future.pop();
+    store.history.past.push(next);
+    const data = JSON.parse(next);
+    store.project.objects = data.objects;
+    store.project.groups = data.groups || [];
+    store.project.tracks = data.tracks;
+    store.selectedObjectIds = [];
+    store.selectedClipId = null;
+    store.isDirty = true;
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Clipboard (Copy / Paste)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  copySelection() {
+    const selected = store.selectedObjectIds
+      .map(id => store.project.objects.find(o => o.id === id))
+      .filter(Boolean);
+    if (selected.length === 0) return;
+    store.clipboard = JSON.parse(JSON.stringify(selected));
+  },
+
+  pasteSelection() {
+    if (store.clipboard.length === 0) return;
+    const newIds = [];
+    for (const original of store.clipboard) {
+      const clone = JSON.parse(JSON.stringify(original));
+      clone.id = uid('obj');
+      clone.x = (clone.x || 0) + 20;
+      clone.y = (clone.y || 0) + 20;
+      clone.name = clone.name + ' copy';
+      clone.zOrder = store.project.objects.length;
+      store.project.objects.push(clone);
+      newIds.push(clone.id);
+    }
+    store.selectedObjectIds = newIds;
+    store.selectedClipId = null;
+    store.isDirty = true;
+    actions.commitState();
   },
 
   // ══════════════════════════════════════════════════════════════════════════

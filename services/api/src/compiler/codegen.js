@@ -184,6 +184,18 @@ function objectCode(obj, sw, sh, assetsPath, assetMap) {
       lines.push(`${n} = SVGMobject("${filePath}").scale_to_fit_width(${(obj.width / sw * 14).toFixed(3)})`);
       break;
     }
+    case 'latex': {
+      const texStr = (obj.latex || 'E = mc^2').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      lines.push(`${n} = MathTex(r"${texStr}", color=${fill})`);
+      lines.push(`${n}.scale(${(scale * 2).toFixed(3)})`);
+      break;
+    }
+    case 'axes': {
+      const xr = obj.xRange || [-5, 5, 1];
+      const yr = obj.yRange || [-3, 3, 1];
+      lines.push(`${n} = Axes(x_range=[${xr[0]}, ${xr[1]}, ${xr[2]}], y_range=[${yr[0]}, ${yr[1]}, ${yr[2]}], x_length=${(obj.width / sw * 14).toFixed(1)}, y_length=${(obj.height / sh * 8).toFixed(1)}, tips=True)`);
+      break;
+    }
     default:
       lines.push(`${n} = Circle(radius=0.5)  # unknown type: ${obj.type}`);
   }

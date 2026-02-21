@@ -178,6 +178,18 @@ function objCode(obj, sw, sh) {
     case 'svg_asset':
       lines.push(`${n} = SVGMobject("${obj.name || 'asset'}.svg").scale_to_fit_width(${(obj.width / sw * 14).toFixed(3)})`);
       break;
+    case 'latex': {
+      const texStr = (obj.latex || 'E = mc^2').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      lines.push(`${n} = MathTex(r"${texStr}", color=${fill})`);
+      lines.push(`${n}.scale(${(scale * 2).toFixed(3)})`);
+      break;
+    }
+    case 'axes': {
+      const xr = obj.xRange || [-5, 5, 1];
+      const yr = obj.yRange || [-3, 3, 1];
+      lines.push(`${n} = Axes(x_range=[${xr[0]}, ${xr[1]}, ${xr[2]}], y_range=[${yr[0]}, ${yr[1]}, ${yr[2]}], x_length=${(obj.width / sw * 14).toFixed(1)}, y_length=${(obj.height / sh * 8).toFixed(1)}, tips=True)`);
+      break;
+    }
     default:
       lines.push(`${n} = Circle(radius=0.5)  # ${obj.type}`);
   }
@@ -589,6 +601,26 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
       const width = w ? Math.round(parseFloat(w) / 14 * sw) : 200;
       const id = uid('obj');
       const obj = { id, type: 'svg_asset', name, x: sw / 2, y: sh / 2, width, height: Math.round(width * 0.75), fill: '#ffffff', opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
+      objects.push(obj); varMap[name] = id; objById[id] = obj;
+      continue;
+    }
+
+    // MathTex (LaTeX)
+    m = line.match(/^(\w+)\s*=\s*MathTex\(r?"([^"]*)"(?:,\s*color=["']([^"']+)["'])?\)/);
+    if (m) {
+      const [, name, latex, color] = m;
+      const id = uid('obj');
+      const obj = { id, type: 'latex', name, latex, x: sw / 2, y: sh / 2, width: 200, height: 80, fill: color || '#ffffff', opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
+      objects.push(obj); varMap[name] = id; objById[id] = obj;
+      continue;
+    }
+
+    // Axes
+    m = line.match(/^(\w+)\s*=\s*Axes\(x_range=\[([-\d.]+),\s*([-\d.]+),\s*([-\d.]+)\],\s*y_range=\[([-\d.]+),\s*([-\d.]+),\s*([-\d.]+)\]/);
+    if (m) {
+      const [, name, x0, x1, xs, y0, y1, ys] = m;
+      const id = uid('obj');
+      const obj = { id, type: 'axes', name, x: sw / 2, y: sh / 2, width: 400, height: 300, fill: '#ffffff', stroke: '#ffffff', strokeWidth: 2, opacity: 1, rotation: 0, xRange: [parseFloat(x0), parseFloat(x1), parseFloat(xs)], yRange: [parseFloat(y0), parseFloat(y1), parseFloat(ys)], enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
       continue;
     }

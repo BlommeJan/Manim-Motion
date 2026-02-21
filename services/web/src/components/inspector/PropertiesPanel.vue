@@ -158,6 +158,28 @@
         <Num label="Sides" :value="obj.sides || 6" :min="3" :max="20" @input="u('sides', $event)" />
       </Section>
 
+      <!-- LaTeX settings -->
+      <Section v-if="obj.type === 'latex'" label="LaTeX Expression">
+        <textarea class="input input-sm resize-none font-mono" rows="2" :value="obj.latex || ''" @input="u('latex', $event.target.value)" placeholder="E = mc^2"></textarea>
+        <p class="text-[8px] text-studio-text-muted/40 mt-1 leading-snug">Raw LaTeX — renders as MathTex in Manim</p>
+      </Section>
+
+      <!-- Axes settings -->
+      <Section v-if="obj.type === 'axes'" label="Axes Range">
+        <div class="space-y-1.5">
+          <div class="grid grid-cols-3 gap-1">
+            <Num label="X Min" :value="(obj.xRange||[-5,5,1])[0]" :step="1" @input="uRange('xRange', 0, $event)" />
+            <Num label="X Max" :value="(obj.xRange||[-5,5,1])[1]" :step="1" @input="uRange('xRange', 1, $event)" />
+            <Num label="X Step" :value="(obj.xRange||[-5,5,1])[2]" :min="0.1" :step="0.5" @input="uRange('xRange', 2, $event)" />
+          </div>
+          <div class="grid grid-cols-3 gap-1">
+            <Num label="Y Min" :value="(obj.yRange||[-3,3,1])[0]" :step="1" @input="uRange('yRange', 0, $event)" />
+            <Num label="Y Max" :value="(obj.yRange||[-3,3,1])[1]" :step="1" @input="uRange('yRange', 1, $event)" />
+            <Num label="Y Step" :value="(obj.yRange||[-3,3,1])[2]" :min="0.1" :step="0.5" @input="uRange('yRange', 2, $event)" />
+          </div>
+        </div>
+      </Section>
+
       <!-- Z-Order -->
       <Section label="Layer Order">
         <input class="input input-sm w-16" type="number" min="0" :value="obj.zOrder || 0" @change="u('zOrder', Number($event.target.value))" />
@@ -450,7 +472,7 @@ export default {
     },
     typeLabel() {
       if (!this.obj) return '';
-      const m = { dot_grid: 'Grid', svg_asset: 'SVG', rectangle: 'Rect' };
+      const m = { dot_grid: 'Grid', svg_asset: 'SVG', rectangle: 'Rect', latex: 'LaTeX', axes: 'Axes' };
       return m[this.obj.type] || this.obj.type;
     },
     typeBadge() {
@@ -460,7 +482,8 @@ export default {
         triangle:'bg-amber-600 text-white', star:'bg-yellow-600 text-white', polygon:'bg-purple-600 text-white',
         line:'bg-gray-600 text-white', arrow:'bg-red-600 text-white',
         dot:'bg-gray-600 text-white', dot_grid:'bg-purple-600 text-white',
-        text:'bg-pink-500 text-white', image:'bg-amber-600 text-white', svg_asset:'bg-amber-600 text-white'
+        text:'bg-pink-500 text-white', image:'bg-amber-600 text-white', svg_asset:'bg-amber-600 text-white',
+        latex:'bg-purple-600 text-white', axes:'bg-emerald-600 text-white'
       };
       return m[this.obj?.type] || 'bg-gray-600 text-white';
     },
@@ -472,6 +495,12 @@ export default {
 
   methods: {
     u(k, v) { if (this.obj) actions.updateObject(this.obj.id, { [k]: v }); },
+    uRange(prop, idx, val) {
+      if (!this.obj) return;
+      const arr = [...(this.obj[prop] || (prop === 'xRange' ? [-5,5,1] : [-3,3,1]))];
+      arr[idx] = val;
+      actions.updateObject(this.obj.id, { [prop]: arr });
+    },
     uc(k, v) { if (this.clip) actions.updateClip(this.clip.id, { [k]: v }); },
     up(k, v) { if (this.clip) actions.updateClip(this.clip.id, { params: { ...(this.clip.params||{}), [k]: v } }); },
     uStage(k, v) { actions.updateStage({ [k]: v }); },

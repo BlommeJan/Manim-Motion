@@ -33,12 +33,18 @@
 
 ### Key Features
 
-- **Visual Stage Editor**: Black canvas with optional grid, drag-and-drop shapes, resize/rotate handles, multi-select
-- **Shape Library**: Heart, Square, Circle, Dot, 5x5 Dot Grid, plus uploaded images and SVGs
+- **Visual Stage Editor**: Black canvas with optional grid, drag-and-drop shapes, resize/rotate handles, multi-select, snapping
+- **16+ Shape Types**: Rectangle, Square, Circle, Ellipse, Triangle, Star, Hexagon, Arrow, Heart, Line, Dot, 5x5 Grid, Text, Image, SVG
+- **LaTeX Math Objects**: Add `MathTex` expressions (e.g. `E = mc^2`) that render natively in Manim
+- **Coordinate Axes**: Configurable `Axes` with custom x/y ranges and tick steps
 - **Transform Morphing**: Select two shapes and morph between them with customizable easing
 - **Multi-Track Timeline**: Up to 5 tracks with draggable, resizable animation clips
 - **Real-Time Preview**: 60fps playback with sub-frame interpolation
 - **Animation Types**: Transform, Move, Scale, Fade, Rotate with 17 easing functions
+- **Entrance/Exit Animations**: 11 entrance and 9 exit animation presets per object
+- **Undo / Redo**: Full 50-state history stack (Ctrl+Z / Ctrl+Shift+Z)
+- **Copy / Paste**: Duplicate objects with offset (Ctrl+C / Ctrl+V)
+- **Object Grouping**: Group/ungroup objects (Ctrl+G)
 - **Asset Management**: Upload PNGs, JPEGs, SVGs; drag onto stage from sidebar
 - **Server Rendering**: One-click HQ render via Docker (480p to 4K) with progress tracking
 - **Bidirectional Code Editing**: Toggle between visual editor and Python code view
@@ -147,7 +153,7 @@ Manim-docker/
     │       ├── styles/
     │       │   └── main.css        # Global styles + Tailwind
     │       ├── store/
-    │       │   └── project.js      # State management (894 lines)
+    │       │   └── project.js      # State, history, clipboard (~960 lines)
     │       ├── engine/
     │       │   ├── playback.js     # 60fps animation engine (493 lines)
     │       │   ├── easing.js       # 17 easing functions (193 lines)
@@ -232,7 +238,7 @@ Manim-docker/
 #### Root Component (`services/web/src/App.vue`)
 
 The main application shell managing:
-- **Keyboard Shortcuts**: Space (play/pause), V (select), H (hand), Delete, Ctrl+S
+- **Keyboard Shortcuts**: Space (play/pause), V (select), H (hand), Delete, Ctrl+S, Ctrl+Z/Y (undo/redo), Ctrl+C/V (copy/paste), Ctrl+G (group)
 - **Dialogs**: Export Python, Render Video, Code View
 - **Global State**: Integration with Vuex store
 - **Tool Modes**: Select vs Hand (pan) tool toggle
@@ -272,7 +278,7 @@ The main application shell managing:
 
 #### Project Store (`services/web/src/store/project.js`)
 
-**894 lines** of comprehensive state management:
+Comprehensive state management with undo/redo and clipboard:
 
 **State Structure:**
 ```javascript
@@ -296,8 +302,11 @@ state: {
   sceneDuration: 10,  // seconds
   fps: 60,
   
-  // Objects on stage
-  objects: [],  // Array of shape/image/text objects
+  // Objects on stage (17 types)
+  objects: [],
+  
+  // Object groups
+  groups: [],  // { id, name, childIds[], margin, collapsed }
   
   // Animation tracks
   tracks: [
@@ -310,6 +319,12 @@ state: {
   
   // Assets
   assets: [],
+  
+  // History (undo/redo, max 50 states)
+  history: { past: [], future: [] },
+  
+  // Clipboard (copy/paste with +20px offset)
+  clipboard: [],
   
   // UI state
   selectedObjectIds: [],
@@ -329,13 +344,20 @@ state: {
 
 | Action | Description |
 |--------|-------------|
-| `addObject(type, config)` | Adds shape/text/image to stage |
+| `addObject(type, config)` | Adds shape/text/image/latex/axes to stage |
 | `updateObject(id, props)` | Updates object properties |
 | `deleteObject(id)` | Removes object and related clips |
 | `selectObject(id, multi)` | Selects object(s) |
+| `groupObjects()` | Groups selected objects |
+| `ungroupObjects()` | Ungroups selected group |
 | `createClip(type, params)` | Creates animation clip |
 | `updateClip(id, props)` | Modifies clip properties |
 | `deleteClip(id)` | Removes clip from timeline |
+| `commitState()` | Pushes current state to history |
+| `undo()` | Restores previous state |
+| `redo()` | Restores next state |
+| `copySelection()` | Copies selected objects to clipboard |
+| `pasteSelection()` | Pastes clipboard with +20px offset |
 | `setCurrentTime(time)` | Seeks to timestamp |
 | `play()` / `pause()` | Playback control |
 | `saveProject()` | Persists to server |
@@ -492,21 +514,23 @@ export const shapeGenerators = {
 ```
 
 **Supported Shapes:**
-1. Circle
+1. Rectangle
 2. Square
-3. Rectangle
-4. Triangle
-5. Heart
+3. Circle
+4. Ellipse
+5. Triangle
 6. Star
-7. Polygon (N sides)
-8. Dot
-9. 5x5 Dot Grid
-10. Arrow
-11. Double Arrow
-12. Brace
-13. Cross
-14. Plus
-15. Custom SVG path
+7. Hexagon / Polygon (N sides)
+8. Arrow
+9. Heart
+10. Line
+11. Dot
+12. 5x5 Dot Grid
+13. Text
+14. Image
+15. SVG
+16. LaTeX (MathTex)
+17. Coordinate Axes
 
 **Point Resampling:**
 Shapes with different point counts are resampled using linear interpolation to enable morphing between incompatible shapes.
@@ -793,13 +817,13 @@ async loadFont(fontFamily) {
 
 #### Asset Components
 
-**AssetBrowser.vue**
+**AssetBrowser.vue / AssetSidebar.vue**
 
 Sidebar showing:
-- Built-in shapes (Heart, Circle, Square, etc.)
-- Uploaded images
-- Uploaded SVGs
-- Drag-and-drop to stage
+- Built-in shapes (Rectangle, Circle, Star, Heart, Arrow, Line, etc.)
+- LaTeX and Axes buttons for math/graph objects
+- Uploaded images and SVGs
+- Click to add objects to stage
 
 **AssetUploader.vue**
 
@@ -1168,7 +1192,12 @@ const projectSchema = z.object({
 
 const objectSchema = z.object({
   id: z.string(),
-  type: z.enum(['circle', 'square', 'heart', 'text', 'image', 'svg']),
+  type: z.enum([
+    'rectangle', 'square', 'circle', 'ellipse', 'triangle',
+    'star', 'polygon', 'line', 'arrow', 'heart',
+    'dot', 'dot_grid', 'text', 'image', 'svg_asset',
+    'latex', 'axes'
+  ]),
   name: z.string(),
   x: z.number(),
   y: z.number(),
@@ -1860,13 +1889,13 @@ interface Project {
 ```typescript
 interface StageObject {
   id: string;
-  type: 'circle' | 'square' | 'rectangle' | 'heart' | 
-        'star' | 'polygon' | 'text' | 'image' | 'svg' |
-        'dot' | 'dot_grid' | 'arrow' | 'double_arrow' | 
-        'brace' | 'cross' | 'plus';
+  type: 'rectangle' | 'square' | 'circle' | 'ellipse' | 'triangle' |
+        'star' | 'polygon' | 'line' | 'arrow' | 'heart' |
+        'dot' | 'dot_grid' | 'text' | 'image' | 'svg_asset' |
+        'latex' | 'axes';
   name: string;
   
-  // Position (pixels, top-left origin)
+  // Position (pixels, center origin)
   x: number;
   y: number;
   width: number;
@@ -1880,12 +1909,20 @@ interface StageObject {
   opacity: number;   // 0-1
   
   // Type-specific
-  text?: string;           // For text objects
+  content?: string;        // For text objects
   fontFamily?: string;     // For text objects
   fontSize?: number;       // For text objects
   assetId?: string;        // For images/SVGs
-  points?: Point[];        // For custom polygons
   sides?: number;          // For polygon
+  starArms?: number;       // For star
+  innerRatio?: number;     // For star
+  gridCols?: number;       // For dot_grid
+  gridRows?: number;       // For dot_grid
+  dotRadius?: number;      // For dot_grid
+  dotSpacing?: number;     // For dot_grid
+  latex?: string;          // For latex (e.g. "E = mc^2")
+  xRange?: [number, number, number];  // For axes [min, max, step]
+  yRange?: [number, number, number];  // For axes [min, max, step]
   
   // Z-order
   zOrder: number;
@@ -1895,6 +1932,8 @@ interface StageObject {
   duration: number;        // How long it stays
   enterAnim?: string;      // Animation type on enter
   exitAnim?: string;       // Animation type on exit
+  enterAnimDur?: number;   // Entrance animation duration
+  exitAnimDur?: number;    // Exit animation duration
 }
 
 interface Point {
@@ -2252,12 +2291,14 @@ docker run --rm -v manim-docker_studio_data:/data alpine ls -la /data
 | `H` | Hand (pan) tool |
 | `Delete` | Delete selected object/clip |
 | `Escape` | Deselect all, close dialogs |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Shift+Z` / `Ctrl+Y` | Redo |
+| `Ctrl+C` | Copy selected objects |
+| `Ctrl+V` | Paste copied objects |
 | `Ctrl+S` | Save project |
-| `Ctrl+E` | Export Python code |
-| `Ctrl+R` | Render video |
+| `Ctrl+G` | Group selected objects |
 | `Shift+Click` | Multi-select |
 | `Scroll` | Zoom canvas |
-| `Middle Click + Drag` | Pan canvas |
 
 ---
 
@@ -2339,19 +2380,19 @@ MIT
 
 | Component | Lines of Code | Files |
 |-----------|--------------|-------|
-| **Frontend (Web)** | ~5,200 | 35 |
-| ├─ Core App | ~200 | 3 |
-| ├─ Store | ~900 | 1 |
+| **Frontend (Web)** | ~5,800 | 35 |
+| ├─ Core App | ~250 | 3 |
+| ├─ Store | ~960 | 1 |
 | ├─ Engine | ~1,400 | 5 |
-| ├─ Export | ~750 | 1 |
-| ├─ Components | ~1,950 | 25 |
-| **Backend (API)** | ~1,600 | 12 |
+| ├─ Export | ~800 | 1 |
+| ├─ Components | ~2,400 | 25 |
+| **Backend (API)** | ~1,700 | 12 |
 | ├─ Routes | ~800 | 5 |
-| ├─ Compiler | ~700 | 4 |
+| ├─ Compiler | ~750 | 4 |
 | **Renderer** | ~210 | 1 |
 | **Documentation** | ~3,500 | 3 |
-| **TOTAL** | **~10,500** | **51** |
+| **TOTAL** | **~11,200** | **51** |
 
 ---
 
-*Generated on February 9, 2026*
+*Last updated: February 21, 2026*

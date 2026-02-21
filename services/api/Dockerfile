@@ -1,8 +1,6 @@
 FROM node:20-alpine
 
-# Create node user and group
-RUN addgroup -g 1000 -S node && adduser -u 1000 -S node -G node
-
+# node:20-alpine already has node user/group; ensure /app and /data writable
 WORKDIR /app
 
 # Create /data directory for persistent storage and set ownership
