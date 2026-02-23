@@ -1,14 +1,14 @@
 <template>
-  <div id="app" class="h-screen bg-studio-bg text-studio-text flex flex-col overflow-hidden" style="z-index: var(--z-stage);">
+  <div id="app" class="h-screen flex flex-col overflow-hidden" style="z-index: var(--z-stage); background: var(--studio-bg); color: var(--studio-text);">
     <!-- Top Bar -->
     <Topbar />
 
     <!-- Main: Sidebar | Canvas/Code | Properties -->
     <div class="flex-1 flex overflow-hidden min-h-0">
       <AssetSidebar />
-      <div class="flex-1 min-w-0 flex flex-col bg-studio-bg relative">
+      <div class="flex-1 min-w-0 flex flex-col relative" style="background: var(--studio-bg);">
         <!-- Stage / Code toggle pill -->
-        <div class="absolute top-2.5 right-2.5 z-20 flex items-center bg-black/50 backdrop-blur-sm rounded-lg p-0.5 border border-white/5">
+        <div class="absolute top-2.5 right-2.5 z-20 flex items-center backdrop-blur-sm rounded-lg p-0.5" style="background: var(--studio-surface3); border: 1px solid var(--studio-border);">
           <button
             class="stage-tab-btn" :class="{ active: stageViewMode === 'canvas' }"
             @click="stageViewMode = 'canvas'"
@@ -29,11 +29,11 @@
         <StageCanvas v-show="stageViewMode === 'canvas'" />
 
         <!-- Code view -->
-        <div v-show="stageViewMode === 'code'" class="flex-1 flex flex-col overflow-hidden bg-[#08080e] rounded-xl m-0">
+        <div v-show="stageViewMode === 'code'" class="flex-1 flex flex-col overflow-hidden rounded-xl m-0" style="background: var(--studio-surface);">
           <!-- Code toolbar -->
-          <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 flex-shrink-0">
-            <span class="text-[11px] font-semibold text-studio-text-muted uppercase tracking-wider">Manim Scene</span>
-            <span v-if="codeEdited" class="text-[9px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">edited</span>
+          <div class="flex items-center gap-2 px-4 py-2.5 flex-shrink-0" style="border-bottom: 1px solid var(--studio-divider);">
+            <span class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--studio-text-muted);">Manim Scene</span>
+            <span v-if="codeEdited" class="text-[9px] px-1.5 py-0.5 rounded font-medium" style="background: rgb(var(--c-warning) / 0.2); color: var(--studio-warning);">edited</span>
             <div class="flex-1"></div>
             <button v-if="codeEdited" class="code-stage-btn apply-btn" @click="applyCodeToCanvas" title="Parse this code and update the canvas">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -52,22 +52,31 @@
               .py
             </button>
           </div>
-          <!-- Editable code area -->
-          <textarea
-            ref="codeArea"
-            class="flex-1 overflow-auto m-0 px-5 py-4 text-[12px] leading-relaxed font-mono text-[#c9d1d9] code-stage-panel resize-none border-none outline-none"
-            :value="stageCode"
-            @input="onCodeInput"
-            spellcheck="false"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-          ></textarea>
+          <!-- Editable code area with Python syntax highlighting (mirror overlay) -->
+          <div class="code-stage-body flex-1 min-h-0 relative">
+            <pre
+              ref="highlightPre"
+              class="code-highlight-mirror"
+              aria-hidden="true"
+              v-html="highlightedCode"
+            ></pre>
+            <textarea
+              ref="codeArea"
+              class="code-stage-textarea"
+              :value="stageCode"
+              @input="onCodeInput"
+              @scroll="syncCodeScroll"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+            ></textarea>
+          </div>
           <!-- Footer -->
-          <div class="flex items-center justify-between px-4 py-2 border-t border-white/5 flex-shrink-0">
-            <span v-if="parseMessage" class="text-[10px]" :class="parseMessageOk ? 'text-emerald-400' : 'text-red-400'">{{ parseMessage }}</span>
-            <span v-else class="text-[10px] text-studio-text-muted/50">Edit the code, then "Apply to Canvas" to update objects</span>
-            <button class="text-[10px] text-studio-accent hover:text-studio-accent/80 transition-colors" @click="stageViewMode = 'canvas'">
+          <div class="flex items-center justify-between px-4 py-2 flex-shrink-0" style="border-top: 1px solid var(--studio-divider);">
+            <span v-if="parseMessage" class="text-[10px]" :style="parseMessageOk ? 'color: var(--studio-success)' : 'color: var(--studio-danger)'">{{ parseMessage }}</span>
+            <span v-else class="text-[10px]" style="color: var(--studio-text-muted); opacity: 0.5;">Edit the code, then "Apply to Canvas" to update objects</span>
+            <button class="text-[10px] transition-colors" style="color: var(--studio-accent);" @click="stageViewMode = 'canvas'">
               ← Back to Canvas
             </button>
           </div>
@@ -84,13 +93,13 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <transition name="fade">
       <div v-if="showExport" class="fixed inset-0 bg-black/60 flex items-center justify-center" style="z-index: var(--z-modal);" @click.self="closeExport">
-        <div class="bg-studio-surface border border-studio-border rounded-xl w-[700px] max-h-[80vh] flex flex-col shadow-2xl">
-          <div class="px-5 py-4 border-b border-studio-border flex items-center justify-between">
+        <div class="rounded-xl w-[700px] max-h-[80vh] flex flex-col shadow-2xl" style="background: var(--studio-surface); border: 1px solid var(--studio-border);">
+          <div class="px-5 py-4 flex items-center justify-between" style="border-bottom: 1px solid var(--studio-border);">
             <div>
               <h2 class="text-base font-semibold">Export to Manim</h2>
-              <p class="text-[11px] text-studio-text-muted mt-0.5">Download a self-contained scene.py</p>
+              <p class="text-[11px] mt-0.5" style="color: var(--studio-text-muted);">Download a self-contained scene.py</p>
             </div>
-            <button @click="closeExport" class="text-studio-text-muted hover:text-studio-text text-lg">&times;</button>
+            <button @click="closeExport" class="text-lg" style="color: var(--studio-text-muted);">&times;</button>
           </div>
           <div class="flex-1 overflow-y-auto p-5">
             <div class="mb-3 flex items-center gap-2">
@@ -103,11 +112,11 @@
                 {{ copied ? 'Copied!' : 'Copy Code' }}
               </button>
             </div>
-            <div class="bg-studio-bg rounded-lg p-4 border border-studio-border">
-              <p class="text-[10px] text-studio-text-muted mb-2 font-medium uppercase tracking-wider">Run this command:</p>
-              <code class="text-sm text-studio-accent font-mono block mb-3 select-all">manim -qh scene.py MainScene</code>
-              <p class="text-[10px] text-studio-text-muted mb-2 font-medium uppercase tracking-wider">Generated Python:</p>
-              <pre class="text-[11px] font-mono text-studio-text-muted whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed">{{ exportCode }}</pre>
+            <div class="rounded-lg p-4" style="background: var(--studio-bg); border: 1px solid var(--studio-border);">
+              <p class="text-[10px] mb-2 font-medium uppercase tracking-wider" style="color: var(--studio-text-muted);">Run this command:</p>
+              <code class="text-sm font-mono block mb-3 select-all" style="color: var(--studio-accent);">manim -qh scene.py MainScene</code>
+              <p class="text-[10px] mb-2 font-medium uppercase tracking-wider" style="color: var(--studio-text-muted);">Generated Python:</p>
+              <pre class="text-[11px] font-mono whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed" style="color: var(--studio-text-muted);">{{ exportCode }}</pre>
             </div>
             <div v-if="hasImages" class="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
               <p class="text-xs text-amber-400">
@@ -124,14 +133,13 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <transition name="fade">
       <div v-if="showRender" class="fixed inset-0 bg-black/60 flex items-center justify-center" style="z-index: var(--z-modal);" @click.self="closeRender">
-        <div class="bg-studio-surface border border-studio-border rounded-xl w-[540px] max-h-[85vh] flex flex-col shadow-2xl">
-          <!-- Header -->
-          <div class="px-5 py-4 border-b border-studio-border flex items-center justify-between">
+        <div class="rounded-xl w-[540px] max-h-[85vh] flex flex-col shadow-2xl" style="background: var(--studio-surface); border: 1px solid var(--studio-border);">
+          <div class="px-5 py-4 flex items-center justify-between" style="border-bottom: 1px solid var(--studio-border);">
             <div>
               <h2 class="text-base font-semibold">Render with Manim</h2>
-              <p class="text-[11px] text-studio-text-muted mt-0.5">High-quality render via Docker</p>
+              <p class="text-[11px] mt-0.5" style="color: var(--studio-text-muted);">High-quality render via Docker</p>
             </div>
-            <button @click="closeRender" class="text-studio-text-muted hover:text-studio-text text-lg">&times;</button>
+            <button @click="closeRender" class="text-lg" style="color: var(--studio-text-muted);">&times;</button>
           </div>
 
           <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -211,13 +219,13 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <transition name="fade">
       <div v-if="showProjectBrowser" class="fixed inset-0 bg-black/60 flex items-center justify-center" style="z-index: var(--z-modal);" @click.self="closeProjectBrowser">
-        <div class="bg-studio-surface border border-studio-border rounded-xl w-[500px] max-h-[70vh] flex flex-col shadow-2xl">
-          <div class="px-5 py-4 border-b border-studio-border flex items-center justify-between">
+        <div class="rounded-xl w-[500px] max-h-[70vh] flex flex-col shadow-2xl" style="background: var(--studio-surface); border: 1px solid var(--studio-border);">
+          <div class="px-5 py-4 flex items-center justify-between" style="border-bottom: 1px solid var(--studio-border);">
             <div>
               <h2 class="text-base font-semibold">Server Projects</h2>
-              <p class="text-[11px] text-studio-text-muted mt-0.5">Load a project from the Docker server</p>
+              <p class="text-[11px] mt-0.5" style="color: var(--studio-text-muted);">Load a project from the Docker server</p>
             </div>
-            <button @click="closeProjectBrowser" class="text-studio-text-muted hover:text-studio-text text-lg">&times;</button>
+            <button @click="closeProjectBrowser" class="text-lg" style="color: var(--studio-text-muted);">&times;</button>
           </div>
           <div class="flex-1 overflow-y-auto p-4">
             <div v-if="serverProjects.length === 0" class="text-center py-8 text-studio-text-muted">
@@ -259,16 +267,17 @@
 
     <!-- Error Toast -->
     <transition name="slide-up">
-      <div v-if="error" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-studio-surface border border-studio-error/30 text-studio-text px-5 py-3 rounded-xl shadow-xl flex items-center gap-3" style="z-index: var(--z-overlay);">
-        <span class="text-studio-error">!</span>
+      <div v-if="error" class="fixed bottom-4 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl shadow-xl flex items-center gap-3" style="z-index: var(--z-overlay); background: var(--studio-surface); border: 1px solid rgb(var(--c-danger) / 0.3); color: var(--studio-text);">
+        <span style="color: var(--studio-danger);">!</span>
         <span class="text-sm">{{ error }}</span>
-        <button @click="clearError" class="text-studio-text-muted hover:text-studio-text ml-2">&times;</button>
+        <button @click="clearError" class="ml-2" style="color: var(--studio-text-muted);">&times;</button>
       </div>
     </transition>
   </div>
 </template>
 
 <script>
+import hljs from 'highlight.js';
 import { store, actions, getters } from './store/project.js';
 import { getPlaybackEngine } from './engine/playback.js';
 import { generateManimScript, downloadManimScript, parseManimScript } from './export/manim.js';
@@ -334,6 +343,14 @@ export default {
     renderProgress() {
       const map = { uploading: 15, saving: 30, queued: 45, running: 70, completed: 100, failed: 100 };
       return map[store.renderStatus] || 0;
+    },
+
+    highlightedCode() {
+      try {
+        return hljs.highlight(this.stageCode, { language: 'python' }).value;
+      } catch (_) {
+        return this.escapeHtml(this.stageCode);
+      }
     }
   },
 
@@ -461,6 +478,7 @@ export default {
       this.codeEdited = false;
       this.parseMessage = '';
       this.updateStageCode();
+      this.$nextTick(() => this.syncCodeScroll());
     },
     updateStageCode() {
       try {
@@ -473,6 +491,19 @@ export default {
     _debouncedUpdateCode() {
       clearTimeout(this._stageCodeTimer);
       this._stageCodeTimer = setTimeout(() => this.updateStageCode(), 300);
+    },
+    syncCodeScroll() {
+      const ta = this.$refs.codeArea;
+      const pre = this.$refs.highlightPre;
+      if (ta && pre) {
+        pre.scrollTop = ta.scrollTop;
+        pre.scrollLeft = ta.scrollLeft;
+      }
+    },
+    escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     },
     onCodeInput(e) {
       this.stageCode = e.target.value;
@@ -540,18 +571,29 @@ export default {
 .slide-up-enter, .slide-up-leave-to { transform: translateY(20px) translateX(-50%); opacity: 0; }
 
 .quality-btn {
-  @apply flex flex-col items-center gap-0.5 p-2.5 rounded-lg border border-studio-border;
-  @apply hover:border-studio-accent/40 transition-all cursor-pointer text-center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--studio-border);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
 }
+.quality-btn:hover { border-color: var(--studio-accent); }
 .quality-btn.active {
-  @apply border-studio-accent bg-studio-accent/10 text-studio-accent;
+  border-color: var(--studio-accent);
+  background: var(--studio-accent-subtle);
+  color: var(--studio-accent);
 }
 
 .render-spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255,255,255,0.15);
-  border-top-color: var(--studio-accent, #6366f1);
+  border: 3px solid var(--studio-border);
+  border-top-color: var(--studio-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -565,16 +607,16 @@ export default {
   border-radius: 6px;
   font-size: 10px;
   font-weight: 600;
-  color: rgba(255,255,255,0.4);
+  color: var(--studio-text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
   border: none;
   background: transparent;
 }
-.stage-tab-btn:hover { color: rgba(255,255,255,0.7); }
+.stage-tab-btn:hover { color: var(--studio-text); }
 .stage-tab-btn.active {
-  background: rgba(99,102,241,0.2);
-  color: #a5b4fc;
+  background: var(--studio-accent-subtle);
+  color: var(--studio-accent);
 }
 
 .code-stage-btn {
@@ -585,34 +627,80 @@ export default {
   border-radius: 6px;
   font-size: 10px;
   font-weight: 500;
-  color: rgba(255,255,255,0.45);
+  color: var(--studio-text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--studio-border);
+  background: transparent;
 }
 .code-stage-btn:hover {
-  color: rgba(255,255,255,0.8);
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.15);
+  color: var(--studio-text);
+  background: var(--studio-border);
 }
 .code-stage-btn.apply-btn {
-  background: rgba(16,185,129,0.15);
-  border-color: rgba(16,185,129,0.3);
-  color: #34d399;
+  background: var(--studio-success-subtle);
+  border-color: var(--studio-success);
+  color: var(--studio-success);
 }
 .code-stage-btn.apply-btn:hover {
-  background: rgba(16,185,129,0.25);
-  border-color: rgba(16,185,129,0.5);
-  color: #6ee7b7;
+  background: rgb(var(--c-success) / 0.2);
 }
 
-.code-stage-panel {
+.code-stage-body {
+  overflow: hidden;
+}
+.code-highlight-mirror,
+.code-stage-textarea {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 1rem 1.25rem;
+  font-size: 12px;
+  line-height: 1.625;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   tab-size: 4;
   -moz-tab-size: 4;
-  background: #0d1117;
+  overflow: auto;
+  white-space: pre;
+  border: none;
+  outline: none;
+  resize: none;
 }
-.code-stage-panel::selection {
-  background: rgba(99,102,241,0.3);
+.code-highlight-mirror {
+  pointer-events: none;
+  background: var(--studio-surface2);
+  color: var(--studio-text);
 }
+.code-highlight-mirror code {
+  padding: 0;
+  background: transparent;
+  font: inherit;
+}
+.code-stage-textarea {
+  background: transparent;
+  color: transparent;
+  caret-color: var(--studio-text);
+}
+.code-stage-textarea::placeholder {
+  color: var(--studio-text-muted);
+}
+.code-stage-textarea::selection {
+  background: rgb(var(--c-accent) / 0.35);
+}
+
+/* Python syntax highlighting (theme-aware) */
+.code-highlight-mirror .hljs-keyword,
+.code-highlight-mirror .hljs-selector-tag,
+.code-highlight-mirror .hljs-built_in { color: var(--studio-accent); }
+.code-highlight-mirror .hljs-string { color: var(--studio-success); }
+.code-highlight-mirror .hljs-number { color: var(--studio-warning); }
+.code-highlight-mirror .hljs-comment { color: var(--studio-text-muted); font-style: italic; }
+.code-highlight-mirror .hljs-title.class_,
+.code-highlight-mirror .hljs-title.function_ { color: var(--studio-accent); }
+.code-highlight-mirror .hljs-params,
+.code-highlight-mirror .hljs-attr { color: var(--studio-text); }
+.code-highlight-mirror .hljs-meta,
+.code-highlight-mirror .hljs-doctag { color: var(--studio-text-muted); }
+.code-highlight-mirror .hljs-literal,
+.code-highlight-mirror .hljs-name { color: var(--studio-text); }
 </style>

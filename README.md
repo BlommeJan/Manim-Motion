@@ -21,29 +21,27 @@
 
 ## Screenshots
 
-<table>
-  <tr>
-    <td align="center"><strong>Clean canvas with shape palette</strong></td>
-    <td align="center"><strong>Objects on stage with properties panel</strong></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/01-empty-canvas.png" alt="Empty canvas" width="480"></td>
-    <td><img src="docs/screenshots/02-shapes-on-stage.png" alt="Shapes on stage" width="480"></td>
-  </tr>
-  <tr>
-    <td align="center" colspan="2"><strong>Live code view -- generated Manim Python updates in real time</strong></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><img src="docs/screenshots/03-code-view.png" alt="Code view" width="720"></td>
-  </tr>
-</table>
+*Current UI: desktop menubar, light/dark themes, and configurable canvas.*
+
+| Light theme | Dark theme |
+|-------------|------------|
+| [![Light theme](docs/screenshots/light-main.png)](docs/screenshots/light-main.png) | [![Dark theme](docs/screenshots/dark-main.png)](docs/screenshots/dark-main.png) |
+| *Main window (light)* | *Main window (dark)* |
+
+| File menu (light) | File menu (dark) |
+|-------------------|------------------|
+| [![File menu light](docs/screenshots/light-file-menu.png)](docs/screenshots/light-file-menu.png) | [![File menu dark](docs/screenshots/dark-file-menu.png)](docs/screenshots/dark-file-menu.png) |
+
+Screenshots are stored in `docs/screenshots/`. Replace or add PNGs there and update the paths above if you change the UI.
 
 ---
 
 ## Features
 
 ### Visual Editor
-- **Drag-and-drop stage** -- Black canvas with optional grid, resize/rotate handles, multi-select, snapping
+- **Drag-and-drop stage** -- Canvas with optional grid, resize/rotate handles, multi-select, snapping; background color and opacity configurable in the Properties panel (no selection)
+- **Light & Dark themes** -- Toggle between warm light and sleek dark palettes via View > Theme; persists across sessions
+- **Desktop-style menubar** -- File, Edit, View, Tools, Help menus with keyboard shortcuts and responsive collapse
 - **16 shape types** -- Rectangle, Square, Circle, Ellipse, Triangle, Star, Hexagon, Arrow, Heart, Line, Dot, 5x5 Grid, Text, Image, SVG, and more
 - **LaTeX math objects** -- Add `MathTex` expressions (e.g. `E = mc^2`) that render natively in Manim
 - **Coordinate Axes** -- Configurable `Axes` with custom x/y ranges and tick steps
@@ -59,7 +57,7 @@
 ### Workflow
 - **Undo / Redo** -- Full history stack (Ctrl+Z / Ctrl+Shift+Z) with 50-state memory
 - **Copy / Paste** -- Duplicate objects with offset (Ctrl+C / Ctrl+V)
-- **Live Code view** -- See generated Manim Python update in real time; copy or download `.py` directly
+- **Live Code view** -- Generated Manim Python with syntax highlighting; edit, apply to canvas, copy, or download `.py`
 - **Server rendering** -- One-click HQ render via Docker (480p to 4K) with progress tracking
 - **Project management** -- Save/load locally (JSON) or sync to Docker server
 
@@ -119,7 +117,7 @@ Browser (localhost:8080)
         |-- Updates job status in Redis
 ```
 
-**Shared Docker volume** (`studio_data` at `/data`):
+**Shared Docker volume** (`manim_motion_data` at `/data`):
 - `projects/` -- Project JSON + generated `scene.py`
 - `assets/` -- Uploaded images/SVGs per project
 - `renders/` -- Output MP4 files per project
@@ -147,13 +145,13 @@ Drag shapes on the canvas. Edit fill, stroke, opacity, size, rotation in the Pro
 Press **Space** to play the animation at 60fps. Scrub the timeline ruler to seek.
 
 ### 6. Render
-Click **Render HQ** in the top bar. Choose quality (Low/Medium/High/4K) and click Start Render. The project is saved to the server, compiled to a Manim scene, and rendered. When done, watch the preview and download the MP4.
+Click **Tools > Render HQ** in the menubar. Choose quality (Low/Medium/High/4K) and click Start Render. The project is saved to the server, compiled to a Manim scene, and rendered. When done, watch the preview and download the MP4.
 
 ### 7. Live Code View
-Click the **Code** tab to see the generated Manim Python code update in real time as you add shapes and animations. Copy or download the `.py` directly.
+Click the **Code** tab to see the generated Manim Python with syntax highlighting. Edit the code and click **Apply to Canvas** to update the scene, or copy/download the `.py` file.
 
 ### 8. Export
-Click **Export .py** to download a standalone `scene.py` you can run locally with `manim -qh scene.py MainScene`.
+Click **File > Export .py** to download a standalone `scene.py` you can run locally with `manim -qh scene.py MainScene`.
 
 ---
 
@@ -230,7 +228,8 @@ Manim-docker/
     |   +-- src/
     |   |   +-- App.vue               # Root: dialogs, shortcuts
     |   |   +-- api.js                # API client
-    |   |   +-- store/project.js      # State, history, clipboard
+    |   |   +-- store/project.js      # State, history, clipboard, theme
+    |   |   +-- styles/main.css       # Theme tokens, light/dark palettes
     |   |   +-- engine/               # Playback engine
     |   |   |   +-- geometry.js       # Shape point generation
     |   |   |   +-- easing.js         # 17 easing functions
@@ -239,7 +238,7 @@ Manim-docker/
     |   |   |   +-- blending.js       # Multi-track blending
     |   |   +-- export/manim.js       # Client-side .py generator
     |   |   +-- components/
-    |   |       +-- topbar/           # Project name, controls, render
+    |   |       +-- topbar/           # Desktop menubar (File, Edit, View, Tools, Help)
     |   |       +-- sidebar/          # Shapes, assets, transform
     |   |       +-- stage/            # Konva canvas
     |   |       +-- inspector/        # Properties panel
@@ -325,7 +324,7 @@ npm test
 
 ## Tech Stack
 
-- **Frontend**: Vue 2.7, Konva.js, Tailwind CSS, Vite
+- **Frontend**: Vue 2.7, Konva.js, Tailwind CSS (with CSS-variable theming), Vite
 - **Backend**: Node.js 20, Express, Multer, Zod, Redis
 - **Renderer**: Python, Manim Community Edition
 - **Infrastructure**: Docker Compose, Nginx, Alpine Linux

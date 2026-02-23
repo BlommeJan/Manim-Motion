@@ -6,7 +6,7 @@
     @dragleave.prevent="onDragLeave"
     @drop.prevent="onDrop"
   >
-    <div ref="container" class="flex-1 bg-[#08080e] rounded-xl overflow-hidden relative" style="min-height: 0;">
+    <div ref="container" class="flex-1 rounded-xl overflow-hidden relative" style="min-height: 0; background: var(--studio-surface2);">
       <v-stage ref="konvaStage" :config="stageConfig" @mousedown="handleStageMouseDown" @wheel="handleWheel">
         <!-- Background layer -->
         <v-layer>
@@ -23,34 +23,34 @@
         <v-layer ref="objectsLayer">
           <template v-for="obj in sortedObjects">
             <!-- Rectangle / Square -->
-            <v-rect v-if="(obj.type === 'square' || obj.type === 'rectangle') && isVis(obj.id)" :key="obj.id" :config="rectCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-rect v-if="(obj.type === 'square' || obj.type === 'rectangle') && isVis(obj.id)" :key="obj.id" :config="rectCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Circle -->
-            <v-circle v-if="obj.type === 'circle' && isVis(obj.id)" :key="obj.id" :config="circleCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-circle v-if="obj.type === 'circle' && isVis(obj.id)" :key="obj.id" :config="circleCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Ellipse -->
-            <v-ellipse v-if="obj.type === 'ellipse' && isVis(obj.id)" :key="obj.id" :config="ellipseCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-ellipse v-if="obj.type === 'ellipse' && isVis(obj.id)" :key="obj.id" :config="ellipseCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Dot -->
             <v-circle v-if="obj.type === 'dot' && isVis(obj.id)" :key="obj.id" :config="dotCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" />
 
             <!-- Heart -->
-            <v-shape v-if="obj.type === 'heart' && isVis(obj.id)" :key="obj.id" :config="heartCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-shape v-if="obj.type === 'heart' && isVis(obj.id)" :key="obj.id" :config="heartCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Triangle -->
-            <v-line v-if="obj.type === 'triangle' && isVis(obj.id)" :key="obj.id" :config="triangleCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-line v-if="obj.type === 'triangle' && isVis(obj.id)" :key="obj.id" :config="triangleCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Star -->
-            <v-star v-if="obj.type === 'star' && isVis(obj.id)" :key="obj.id" :config="starCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-star v-if="obj.type === 'star' && isVis(obj.id)" :key="obj.id" :config="starCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Polygon (hexagon) -->
-            <v-regular-polygon v-if="obj.type === 'polygon' && isVis(obj.id)" :key="obj.id" :config="polygonCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-regular-polygon v-if="obj.type === 'polygon' && isVis(obj.id)" :key="obj.id" :config="polygonCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Line -->
             <v-line v-if="obj.type === 'line' && isVis(obj.id)" :key="obj.id" :config="lineCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" />
 
             <!-- Arrow -->
-            <v-arrow v-if="obj.type === 'arrow' && isVis(obj.id)" :key="obj.id" :config="arrowCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-arrow v-if="obj.type === 'arrow' && isVis(obj.id)" :key="obj.id" :config="arrowCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- Dot Grid -->
             <v-group v-if="obj.type === 'dot_grid' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)">
@@ -58,20 +58,20 @@
             </v-group>
 
             <!-- Text -->
-            <v-text v-if="obj.type === 'text' && isVis(obj.id)" :key="obj.id + '-' + fontLoadKey" :config="textCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" @dblclick="onTextDblClick(obj.id)" />
+            <v-text v-if="obj.type === 'text' && isVis(obj.id)" :key="obj.id + '-' + fontLoadKey" :config="textCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" @dblclick="onTextDblClick(obj.id)" />
 
             <!-- Image / SVG -->
-            <v-image v-if="(obj.type === 'image' || obj.type === 'svg_asset') && isVis(obj.id) && imageElements[obj.assetId]" :key="obj.id" :config="imageCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
+            <v-image v-if="(obj.type === 'image' || obj.type === 'svg_asset') && isVis(obj.id) && imageElements[obj.assetId]" :key="obj.id" :config="imageCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)" />
 
             <!-- LaTeX -->
-            <v-group v-if="obj.type === 'latex' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)">
+            <v-group v-if="obj.type === 'latex' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)">
               <v-rect :config="latexBgCfg(obj)" />
               <v-text :config="latexTextCfg(obj)" />
               <v-text :config="latexBadgeCfg(obj)" />
             </v-group>
 
             <!-- Axes -->
-            <v-group v-if="obj.type === 'axes' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)">
+            <v-group v-if="obj.type === 'axes' && isVis(obj.id)" :key="obj.id" :config="groupCfg(obj)" @mousedown="onObjDown(obj.id, $event)" @dragend="onDragEnd(obj.id, $event)" @transform="onTransform(obj.id, $event)" @transformend="onTransformEnd(obj.id, $event)">
               <v-rect :config="axesBgCfg(obj)" />
               <v-line :config="axesXLineCfg(obj)" />
               <v-line :config="axesYLineCfg(obj)" />
@@ -109,8 +109,8 @@
       <!-- Empty state -->
       <div v-if="objects.length === 0 && !isDraggingOver" class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
         <div class="text-center max-w-xs px-6">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/20 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-indigo-400">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-studio-accent/10 border border-studio-accent/20 flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-studio-accent">
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </div>
@@ -144,7 +144,10 @@ export default {
       zoomLevel: 1,
       imageElements: {},
       isDraggingOver: false,
-      fontLoadKey: 0 // Used to force re-render when fonts load
+      fontLoadKey: 0, // Used to force re-render when fonts load
+      shiftKey: false, // When true, transformer keeps aspect ratio
+      // Live transform during drag (canvas px) — avoids store updates so resize/rotate stay smooth
+      liveTransform: null
     };
   },
 
@@ -170,12 +173,15 @@ export default {
       return {
         x: this.ox, y: this.oy,
         width: this.stg.width * this.vs, height: this.stg.height * this.vs,
-        fill: this.stg.backgroundColor,
+        fill: this.stg.backgroundColor || '#000000',
         opacity: this.stg.backgroundOpacity ?? 1,
         cornerRadius: 4,
         shadowColor: '#000', shadowBlur: 40, shadowOpacity: 0.6
       };
     },
+
+    themeAccent() { return this.getCssVar('--studio-accent') || '#4CEEF9'; },
+    themeSurface() { return this.getCssVar('--studio-text') || '#E6EDF3'; },
 
     gridLines() {
       const lines = [];
@@ -192,18 +198,19 @@ export default {
 
     centerH() {
       const gridOpacity = this.stg.gridOpacity ?? 0.12;
-      return { points: [this.ox, this.oy + this.stg.height * this.vs / 2, this.ox + this.stg.width * this.vs, this.oy + this.stg.height * this.vs / 2], stroke: '#6366f1', strokeWidth: 0.5, opacity: gridOpacity + 0.06, dash: [8, 4], listening: false };
+      return { points: [this.ox, this.oy + this.stg.height * this.vs / 2, this.ox + this.stg.width * this.vs, this.oy + this.stg.height * this.vs / 2], stroke: this.themeAccent, strokeWidth: 0.5, opacity: gridOpacity + 0.06, dash: [8, 4], listening: false };
     },
     centerV() {
       const gridOpacity = this.stg.gridOpacity ?? 0.12;
-      return { points: [this.ox + this.stg.width * this.vs / 2, this.oy, this.ox + this.stg.width * this.vs / 2, this.oy + this.stg.height * this.vs], stroke: '#6366f1', strokeWidth: 0.5, opacity: gridOpacity + 0.06, dash: [8, 4], listening: false };
+      return { points: [this.ox + this.stg.width * this.vs / 2, this.oy, this.ox + this.stg.width * this.vs / 2, this.oy + this.stg.height * this.vs], stroke: this.themeAccent, strokeWidth: 0.5, opacity: gridOpacity + 0.06, dash: [8, 4], listening: false };
     },
 
     trConfig() {
+      const accent = this.themeAccent;
       return {
-        anchorSize: 8, anchorFill: '#6366f1', anchorStroke: '#fff', anchorStrokeWidth: 1.5,
-        borderStroke: '#6366f1', borderStrokeWidth: 1.5, borderDash: [6, 4],
-        rotateEnabled: true, keepRatio: false,
+        anchorSize: 8, anchorFill: accent, anchorStroke: '#fff', anchorStrokeWidth: 1.5,
+        borderStroke: accent, borderStrokeWidth: 1.5, borderDash: [6, 4],
+        rotateEnabled: true, keepRatio: this.shiftKey,
         enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
         boundBoxFunc: (o, n) => (n.width < 10 || n.height < 10) ? o : n
       };
@@ -239,7 +246,7 @@ export default {
           id: group.id,
           x: p1.x, y: p1.y, width: w, height: h,
           fill: 'transparent',
-          stroke: '#a78bfa', strokeWidth: 1.5, dash: [6, 4],
+          stroke: this.themeAccent, strokeWidth: 1.5, dash: [6, 4],
           opacity: 0.5, cornerRadius: 6, listening: false
         });
       }
@@ -258,10 +265,21 @@ export default {
     this._ro.observe(this.$refs.container);
     this.loadNewImages();
     this.loadNewFonts();
+    this._onKeyDown = (e) => { if (e.key === 'Shift') this.shiftKey = true; };
+    this._onKeyUp = (e) => { if (e.key === 'Shift') this.shiftKey = false; };
+    window.addEventListener('keydown', this._onKeyDown);
+    window.addEventListener('keyup', this._onKeyUp);
   },
-  beforeDestroy() { if (this._ro) this._ro.disconnect(); },
+  beforeDestroy() {
+    if (this._ro) this._ro.disconnect();
+    if (this._onKeyDown) window.removeEventListener('keydown', this._onKeyDown);
+    if (this._onKeyUp) window.removeEventListener('keyup', this._onKeyUp);
+  },
 
   methods: {
+    getCssVar(name) {
+      try { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); } catch { return ''; }
+    },
     updateSize() {
       if (this.$refs.container) {
         this.containerWidth = this.$refs.container.clientWidth;
@@ -362,27 +380,37 @@ export default {
     },
 
     // ── Shape configs ──
+    live(obj) {
+      return this.liveTransform && this.liveTransform.id === obj.id ? this.liveTransform : null;
+    },
     rectCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x - e.width / 2, e.y - e.height / 2);
-      return { x: p.x, y: p.y, width: e.width * this.vs, height: e.height * this.vs, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, cornerRadius: (obj.type === 'square' ? 4 : 2) * this.vs, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x - e.width / 2, e.y - e.height / 2);
+      const w = L ? L.w : e.width * this.vs, h = L ? L.h : e.height * this.vs, rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, width: w, height: h, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1, cornerRadius: (obj.type === 'square' ? 4 : 2) * this.vs, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
     },
     circleCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y); const r = Math.min(e.width, e.height) / 2 * this.vs;
-      return { x: p.x, y: p.y, radius: r, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y); const r = L ? Math.min(L.w, L.h) / 2 : Math.min(e.width, e.height) / 2 * this.vs;
+      const rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, radius: r, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
     },
     ellipseCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      return { x: p.x, y: p.y, radiusX: (e.width / 2) * this.vs, radiusY: (e.height / 2) * this.vs, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
+      const rx = L ? L.w / 2 : (e.width / 2) * this.vs, ry = L ? L.h / 2 : (e.height / 2) * this.vs, rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, radiusX: rx, radiusY: ry, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
     },
     dotCfg(obj) {
       const e = this.eff(obj); const p = this.s2c(e.x, e.y);
       return { x: p.x, y: p.y, radius: Math.max(4, e.width / 2 * this.vs), fill: e.fill || '#fff', opacity: e.opacity ?? 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 12 };
     },
     heartCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y); const w = e.width * this.vs; const h = e.height * this.vs;
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y); const w = L ? L.w : e.width * this.vs; const h = L ? L.h : e.height * this.vs; const rot = L ? L.rotation : (e.rotation || 0);
       return {
         x: p.x, y: p.y, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2,
-        opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1,
+        opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1,
         draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10,
         sceneFunc: (ctx, shape) => {
           const hw = w / 2, hh = h / 2;
@@ -398,20 +426,23 @@ export default {
       };
     },
     triangleCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      const hw = e.width / 2 * this.vs, hh = e.height / 2 * this.vs;
-      return { x: p.x, y: p.y, points: [0, -hh, hw, hh, -hw, hh], closed: true, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
+      const hw = L ? L.w / 2 : e.width / 2 * this.vs, hh = L ? L.h / 2 : e.height / 2 * this.vs, rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, points: [0, -hh, hw, hh, -hw, hh], closed: true, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
     },
     starCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      const outerRadius = Math.min(e.width, e.height) / 2 * this.vs;
-      const inner = (obj.innerRatio || 0.4) * outerRadius;
-      return { x: p.x, y: p.y, numPoints: obj.starArms || 5, innerRadius: inner, outerRadius: outerRadius, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
+      const outerRadius = L ? Math.min(L.w, L.h) / 2 : Math.min(e.width, e.height) / 2 * this.vs;
+      const inner = (obj.innerRatio || 0.4) * outerRadius; const rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, numPoints: obj.starArms || 5, innerRadius: inner, outerRadius: outerRadius, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
     },
     polygonCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      const r = Math.min(e.width, e.height) / 2 * this.vs;
-      return { x: p.x, y: p.y, sides: obj.sides || 6, radius: r, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
+      const r = L ? Math.min(L.w, L.h) / 2 : Math.min(e.width, e.height) / 2 * this.vs; const rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, sides: obj.sides || 6, radius: r, fill: e.fill, stroke: e.stroke, strokeWidth: (e.strokeWidth || 2) * this.vs / 2, opacity: e.opacity ?? 1, rotation: rot, scaleX: 1, scaleY: 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 };
     },
     lineCfg(obj) {
       const e = this.eff(obj); const p = this.s2c(e.x, e.y);
@@ -419,32 +450,28 @@ export default {
       return { x: p.x, y: p.y, points: [-hw, 0, hw, 0], stroke: e.stroke || e.fill || '#94a3b8', strokeWidth: Math.max(2, (e.strokeWidth || 3) * this.vs / 2), opacity: e.opacity ?? 1, rotation: e.rotation || 0, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 16, lineCap: 'round' };
     },
     arrowCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      const hw = e.width / 2 * this.vs;
-      return { x: p.x, y: p.y, points: [-hw, 0, hw, 0], fill: e.fill, stroke: e.stroke || e.fill || '#ef4444', strokeWidth: Math.max(2, (e.strokeWidth || 2) * this.vs / 2), opacity: e.opacity ?? 1, rotation: e.rotation || 0, pointerLength: 14 * this.vs / 2, pointerWidth: 12 * this.vs / 2, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 16, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1 };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
+      const hw = L ? L.w / 2 : e.width / 2 * this.vs; const rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, points: [-hw, 0, hw, 0], fill: e.fill, stroke: e.stroke || e.fill || '#ef4444', strokeWidth: Math.max(2, (e.strokeWidth || 2) * this.vs / 2), opacity: e.opacity ?? 1, rotation: rot, pointerLength: 14 * this.vs / 2, pointerWidth: 12 * this.vs / 2, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 16, scaleX: 1, scaleY: 1 };
     },
     textCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      // Manim font_size 48 ≈ 0.5 units tall in practice, so: rendered_px = font_size * stageHeight / 768
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
       const manimFontScale = (e.fontSize || 48) * this.stg.height / 768 * this.vs;
       const fontFamily = e.fontFamily || 'Arial';
       const fontStyle = (e.fontWeight === 'bold' ? 'bold ' : '') + (e.fontStyle === 'italic' ? 'italic ' : '');
       const text = e.content || 'Text';
       const align = e.textAlign || 'center';
-      
-      // Measure text width for alignment
       const textWidth = this.measureTextWidth(text, manimFontScale, fontFamily, fontStyle);
-      
-      // Calculate offsetX based on alignment (x,y is anchor point)
       let offsetX = 0;
       if (align === 'center') offsetX = textWidth / 2;
       else if (align === 'right') offsetX = textWidth;
-      // left: offsetX = 0
-      
+      const rot = L ? L.rotation : (e.rotation || 0);
       return { 
         x: p.x, y: p.y, text, fontSize: manimFontScale, fontFamily, 
         fontStyle: fontStyle.trim(), fill: e.fill || '#ffffff', opacity: e.opacity ?? 1, 
-        rotation: e.rotation || 0, offsetX, offsetY: manimFontScale / 2, 
+        rotation: rot, offsetX, offsetY: manimFontScale / 2, 
         draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject', hitStrokeWidth: 10 
       };
     },
@@ -458,62 +485,66 @@ export default {
       return this._measureCtx.measureText(text).width;
     },
     groupCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x, e.y);
-      return { x: p.x, y: p.y, rotation: e.rotation || 0, opacity: e.opacity ?? 1, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject' };
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
+      const rot = L ? L.rotation : (e.rotation || 0);
+      return { x: p.x, y: p.y, rotation: rot, opacity: e.opacity ?? 1, scaleX: 1, scaleY: 1, draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject' };
     },
     dotGridDots(obj) {
       const sp = (obj.dotSpacing || 40) * this.vs, r = Math.max(2, (obj.dotRadius || 5) * this.vs);
       return generateDotGridPositions(obj.gridCols || 5, obj.gridRows || 5, sp).map(p => ({ x: p.x, y: p.y, radius: r, fill: obj.fill || '#fff', listening: false }));
     },
     imageCfg(obj) {
-      const e = this.eff(obj); const p = this.s2c(e.x - e.width / 2, e.y - e.height / 2);
+      const L = this.live(obj);
+      const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x - e.width / 2, e.y - e.height / 2);
+      const w = L ? L.w : e.width * this.vs, h = L ? L.h : e.height * this.vs, rot = L ? L.rotation : (e.rotation || 0);
       return {
-        x: p.x, y: p.y, width: e.width * this.vs, height: e.height * this.vs,
+        x: p.x, y: p.y, width: w, height: h,
         image: this.imageElements[obj.assetId], opacity: e.opacity ?? 1,
-        rotation: e.rotation || 0, scaleX: e.scaleX || 1, scaleY: e.scaleY || 1,
+        rotation: rot, scaleX: 1, scaleY: 1,
         draggable: store.activeTool === 'select', id: obj.id, name: 'stageObject'
       };
     },
     // ── LaTeX config ──
     latexBgCfg(obj) {
-      const w = obj.width * this.vs, h = obj.height * this.vs;
-      return { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'rgba(168,85,247,0.08)', stroke: '#a855f7', strokeWidth: 1.5, dash: [6, 4], cornerRadius: 6, listening: false };
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs, h = L ? L.h : obj.height * this.vs;
+      return { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'rgba(76,238,249,0.06)', stroke: this.themeAccent, strokeWidth: 1.5, dash: [6, 4], cornerRadius: 6, listening: false };
     },
     latexTextCfg(obj) {
-      const w = obj.width * this.vs, h = obj.height * this.vs;
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs, h = L ? L.h : obj.height * this.vs;
       return { x: -w / 2, y: -h / 2, width: w, height: h, text: obj.latex || 'E = mc^2', fontSize: Math.max(12, 18 * this.vs), fontFamily: 'serif', fontStyle: 'italic', fill: obj.fill || '#ffffff', align: 'center', verticalAlign: 'middle', padding: 8, listening: false };
     },
     latexBadgeCfg(obj) {
-      const w = obj.width * this.vs;
-      return { x: -w / 2 + 4, y: -obj.height * this.vs / 2 + 4, text: 'TEX', fontSize: 9, fill: '#a855f7', fontFamily: 'monospace', fontStyle: 'bold', listening: false };
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs, h = L ? L.h : obj.height * this.vs;
+      return { x: -w / 2 + 4, y: -h / 2 + 4, text: 'TEX', fontSize: 9, fill: this.themeAccent, fontFamily: 'monospace', fontStyle: 'bold', listening: false };
     },
 
     // ── Axes config ──
     axesBgCfg(obj) {
-      const w = obj.width * this.vs, h = obj.height * this.vs;
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs, h = L ? L.h : obj.height * this.vs;
       return { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'rgba(16,185,129,0.04)', stroke: 'rgba(16,185,129,0.15)', strokeWidth: 1, cornerRadius: 4, listening: false };
     },
     axesXLineCfg(obj) {
-      const w = obj.width * this.vs, h = obj.height * this.vs;
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs, h = L ? L.h : obj.height * this.vs;
       return { points: [-w / 2 + 10, 0, w / 2 - 10, 0], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
     },
     axesYLineCfg(obj) {
-      const h = obj.height * this.vs;
+      const L = this.live(obj); const h = L ? L.h : obj.height * this.vs;
       return { points: [0, h / 2 - 10, 0, -h / 2 + 10], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
     },
     axesXArrowCfg(obj) {
-      const w = obj.width * this.vs;
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs;
       const tip = w / 2 - 10;
       return { points: [tip - 8, -5, tip, 0, tip - 8, 5], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
     },
     axesYArrowCfg(obj) {
-      const h = obj.height * this.vs;
+      const L = this.live(obj); const h = L ? L.h : obj.height * this.vs;
       const tip = -h / 2 + 10;
       return { points: [-5, tip + 8, 0, tip, 5, tip + 8], stroke: obj.stroke || '#ffffff', strokeWidth: 1.5, listening: false };
     },
     axesXTicks(obj) {
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs;
       const xr = obj.xRange || [-5, 5, 1];
-      const w = obj.width * this.vs;
       const ticks = [];
       const range = xr[1] - xr[0];
       const step = xr[2] || 1;
@@ -525,8 +556,8 @@ export default {
       return ticks;
     },
     axesYTicks(obj) {
+      const L = this.live(obj); const h = L ? L.h : obj.height * this.vs;
       const yr = obj.yRange || [-3, 3, 1];
-      const h = obj.height * this.vs;
       const ticks = [];
       const range = yr[1] - yr[0];
       const step = yr[2] || 1;
@@ -538,7 +569,7 @@ export default {
       return ticks;
     },
     axesLabelCfg(obj, axis) {
-      const w = obj.width * this.vs, h = obj.height * this.vs;
+      const L = this.live(obj); const w = L ? L.w : obj.width * this.vs, h = L ? L.h : obj.height * this.vs;
       if (axis === 'x') {
         return { x: w / 2 - 20, y: 6, text: 'x', fontSize: 12, fill: obj.stroke || '#ffffff', fontFamily: 'serif', fontStyle: 'italic', listening: false };
       }
@@ -557,6 +588,12 @@ export default {
     handleStageMouseDown(e) {
       const t = e.target; const s = this.$refs.konvaStage?.getNode();
       if (!s) return;
+      // Click on transformer (resize/rotate handles or border) — do not deselect; let transformer handle it
+      let node = t;
+      while (node) {
+        if (node.className === 'Transformer') return;
+        node = node.getParent ? node.getParent() : null;
+      }
       if (t === s || t.name() !== 'stageObject') {
         if (store.activeTool === 'hand') this.startPan(e);
         else actions.deselectAll();
@@ -566,7 +603,7 @@ export default {
       e.cancelBubble = true;
       const ev = e.evt;
       actions.selectObject(id, ev && (ev.shiftKey || ev.ctrlKey || ev.metaKey));
-      this.$nextTick(() => this.updateTransformer());
+      this.$nextTick(() => this.$nextTick(() => this.updateTransformer()));
     },
     onDragEnd(id, e) {
       const node = e.target; const obj = store.project.objects.find(o => o.id === id); if (!obj) return;
@@ -592,28 +629,97 @@ export default {
       }
       actions.updateObject(id, { x: Math.round(newX), y: Math.round(newY) });
     },
+    onTransform(id, e) {
+      const node = e.target;
+      const obj = store.project.objects.find(o => o.id === id);
+      if (!obj) return;
+      const sx = node.scaleX ? node.scaleX() : 1;
+      const sy = node.scaleY ? node.scaleY() : 1;
+      let w, h;
+      if (obj.type === 'circle') {
+        const r = (node.radius ? node.radius() : 10) * sx;
+        w = h = Math.max(10, r * 2);
+      } else if (obj.type === 'ellipse') {
+        w = Math.max(10, (node.radiusX ? node.radiusX() : 20) * 2 * sx);
+        h = Math.max(10, (node.radiusY ? node.radiusY() : 20) * 2 * sy);
+      } else if (this._isGroupType(obj.type)) {
+        w = Math.max(20, (obj.width || 200) * this.vs * sx);
+        h = Math.max(20, (obj.height || 200) * this.vs * sy);
+      } else {
+        w = Math.max(10, Math.abs((node.width ? node.width() : 1) * sx));
+        h = Math.max(10, Math.abs((node.height ? node.height() : 1) * sy));
+      }
+      const rotation = node.rotation ? node.rotation() : 0;
+      this.liveTransform = { id, type: obj.type, x: node.x(), y: node.y(), w, h, rotation };
+    },
     onTransformEnd(id, e) {
       const node = e.target;
       const obj = store.project.objects.find(o => o.id === id);
       if (!obj) return;
-      const scaleX = node.scaleX();
-      const scaleY = node.scaleY();
-      const rotation = node.rotation();
+
+      const sx = node.scaleX ? node.scaleX() : 1;
+      const sy = node.scaleY ? node.scaleY() : 1;
+      const tlTypes = ['square', 'rectangle', 'image', 'svg_asset'];
+      let cw, ch, cx, cy;
+
+      if (obj.type === 'circle') {
+        const r = node.radius ? node.radius() : (node.width ? node.width() / 2 : 20);
+        cw = r * 2;
+        ch = r * 2;
+        cx = node.x();
+        cy = node.y();
+      } else if (obj.type === 'ellipse') {
+        cw = node.radiusX ? node.radiusX() * 2 : (node.width ? node.width() : 40);
+        ch = node.radiusY ? node.radiusY() * 2 : (node.height ? node.height() : 40);
+        cx = node.x();
+        cy = node.y();
+      } else if (this._isGroupType(obj.type)) {
+        cw = (obj.width || 200) * this.vs * sx;
+        ch = (obj.height || 200) * this.vs * sy;
+        cx = node.x();
+        cy = node.y();
+      } else {
+        cw = Math.max(10, Math.abs((node.width ? node.width() : 1) * sx));
+        ch = Math.max(10, Math.abs((node.height ? node.height() : 1) * sy));
+        if (tlTypes.includes(obj.type)) {
+          cx = node.x() + cw / 2;
+          cy = node.y() + ch / 2;
+        } else {
+          cx = node.x();
+          cy = node.y();
+        }
+      }
+
+      const stagePos = this.c2s(cx, cy);
+      const newX = Math.round(stagePos.x);
+      const newY = Math.round(stagePos.y);
+      const newW = Math.max(20, Math.round(cw / this.vs));
+      const newH = Math.max(20, Math.round(ch / this.vs));
+      let rotation = node.rotation ? node.rotation() : 0;
+      if (this.shiftKey) rotation = Math.round(rotation / 45) * 45;
+      else rotation = Math.round(rotation * 10) / 10;
+
       node.scaleX(1);
       node.scaleY(1);
-      const newW = Math.round(Math.abs(obj.width * scaleX));
-      const newH = Math.round(Math.abs(obj.height * scaleY));
-      actions.updateObject(id, { width: Math.max(10, newW), height: Math.max(10, newH), rotation: Math.round(rotation * 10) / 10 });
+
+      actions.updateObject(id, { x: newX, y: newY, width: newW, height: newH, rotation });
+      this.liveTransform = null;
+    },
+    _isGroupType(type) {
+      return type === 'axes' || type === 'latex' || type === 'dot_grid';
     },
     onTextDblClick(id) {
       // Could implement inline editing; for now, focus the properties panel
     },
     updateTransformer() {
-      const tr = this.$refs.transformer; const ks = this.$refs.konvaStage;
+      const tr = this.$refs.transformer; const ol = this.$refs.objectsLayer; const ks = this.$refs.konvaStage;
       if (!tr || !ks) return;
-      const t = tr.getNode(); const s = ks.getNode(); if (!t || !s) return;
-      const nodes = store.selectedObjectIds.map(id => s.findOne('#' + id)).filter(Boolean);
-      t.nodes(nodes); t.getLayer().batchDraw();
+      const t = tr.getNode(); const stage = ks.getNode(); if (!t || !stage) return;
+      const layer = ol && ol.getNode ? ol.getNode() : null;
+      const findNode = (id) => (layer ? layer.findOne('#' + id) : null) || stage.findOne('#' + id);
+      const nodes = store.selectedObjectIds.map(findNode).filter(Boolean);
+      t.nodes(nodes);
+      t.getLayer().batchDraw();
     },
     startPan(e) {
       const start = { x: e.evt.clientX - this.panOffset.x, y: e.evt.clientY - this.panOffset.y };

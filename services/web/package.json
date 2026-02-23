@@ -9,15 +9,16 @@
     "test": "node tests/engine.test.mjs"
   },
   "dependencies": {
-    "vue": "^2.7.16",
+    "highlight.js": "^11.11.1",
     "konva": "^9.3.0",
+    "vue": "^2.7.16",
     "vue-konva": "^2.1.7"
   },
   "devDependencies": {
     "@vitejs/plugin-vue2": "^2.3.1",
-    "vite": "^5.0.12",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.0.12"
   }
 }

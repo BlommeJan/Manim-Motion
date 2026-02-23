@@ -97,7 +97,10 @@ export const store = Vue.observable({
   isDirty: false,
   error: null,
   loading: false,
-  savingToServer: false
+  savingToServer: false,
+
+  // Theme ('light' or 'dark')
+  theme: (typeof localStorage !== 'undefined' && localStorage.getItem('manim-motion-theme')) || 'light'
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -999,6 +1002,12 @@ export const actions = {
   setError(msg) {
     store.error = msg;
     setTimeout(() => { if (store.error === msg) store.error = null; }, 4000);
+  },
+
+  setTheme(id) {
+    store.theme = id;
+    document.documentElement.setAttribute('data-theme', id);
+    try { localStorage.setItem('manim-motion-theme', id); } catch {}
   }
 };
 

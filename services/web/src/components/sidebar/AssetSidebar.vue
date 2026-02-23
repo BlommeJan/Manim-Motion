@@ -33,7 +33,7 @@
         @click="addShape('text')"
         title="Drag or click to add text"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--studio-accent);">
           <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>
         </svg>
         <div>
@@ -41,7 +41,7 @@
           <span class="text-[9px] text-studio-text-muted block">Editable text block</span>
         </div>
       </button>
-      <p class="text-[9px] text-amber-400/70 mt-1.5 leading-relaxed">
+      <p class="text-[9px] mt-1.5 leading-relaxed" style="color: var(--studio-warning); opacity: 0.7;">
         Note: Text size on canvas may differ from the final render.
       </p>
     </div>
@@ -86,10 +86,10 @@
     <div class="p-3 border-b border-studio-border">
       <div class="flex items-center justify-between mb-2">
         <h3 class="section-title mb-0">Vector Images</h3>
-        <span v-if="svgAssets.length" class="text-[9px] text-emerald-400 font-semibold bg-emerald-400/10 px-1.5 py-0.5 rounded-full">{{ svgAssets.length }}</span>
+        <span v-if="svgAssets.length" class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full" style="color: var(--studio-success); background: var(--studio-success-subtle);">{{ svgAssets.length }}</span>
       </div>
 
-      <label class="upload-btn mb-2 cursor-pointer" style="border-color: rgba(16,185,129,0.3);">
+      <label class="upload-btn mb-2 cursor-pointer" style="border-color: var(--studio-success);">
         <input type="file" accept="image/svg+xml" multiple class="hidden" @change="handleUploadSvgs" />
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
@@ -182,7 +182,7 @@ export default {
       e.dataTransfer.effectAllowed = 'copy';
       // Create a small drag preview
       const el = document.createElement('div');
-      el.style.cssText = 'width:40px;height:40px;background:rgba(99,102,241,0.3);border:2px solid #6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;pointer-events:none;position:fixed;top:-100px;';
+      el.style.cssText = 'width:40px;height:40px;background:var(--studio-accent-subtle);border:2px solid var(--studio-accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--studio-text);pointer-events:none;position:fixed;top:-100px;';
       el.textContent = type.charAt(0).toUpperCase();
       document.body.appendChild(el);
       e.dataTransfer.setDragImage(el, 20, 20);
@@ -275,13 +275,9 @@ export default {
   @apply bg-studio-border/60 text-studio-text-muted;
 }
 .btn-transform.active {
-  @apply bg-purple-600 text-white shadow-lg shadow-purple-600/30;
-  animation: pulse-glow-purple 2s ease-in-out infinite;
+  background: var(--studio-accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgb(var(--c-accent) / 0.3);
 }
 .btn-transform:disabled { @apply opacity-40 cursor-not-allowed; }
-
-@keyframes pulse-glow-purple {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4); }
-  50% { box-shadow: 0 0 12px 3px rgba(147, 51, 234, 0.2); }
-}
 </style>

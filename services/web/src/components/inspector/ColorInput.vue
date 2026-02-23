@@ -11,8 +11,9 @@
       :value="displayValue"
       @input="handleTextInput"
       @blur="validateOnBlur"
-      :class="['hex-input text-sm flex-1 px-2 py-1 rounded border bg-studio-bg-primary text-studio-text-primary', 
-               isValid ? 'border-studio-border' : 'border-red-500']"
+      :class="['hex-input text-sm flex-1 px-2 py-1 rounded border', 
+               isValid ? '' : 'invalid']"
+      :style="{ background: 'var(--studio-bg)', color: 'var(--studio-text)', borderColor: isValid ? 'var(--studio-border)' : 'var(--studio-danger)' }"
       placeholder="#000000"
     />
   </div>
@@ -109,10 +110,10 @@ export default {
 
 .hex-input:focus {
   outline: none;
-  border-color: var(--studio-accent, #3b82f6);
+  border-color: var(--studio-accent) !important;
 }
 
-.hex-input.border-red-500 {
-  border-color: #ef4444;
+.hex-input.invalid {
+  border-color: var(--studio-danger) !important;
 }
 </style>

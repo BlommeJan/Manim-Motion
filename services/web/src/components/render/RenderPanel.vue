@@ -22,9 +22,13 @@
       :class="{ 'opacity-50 cursor-not-allowed': isRendering || !hasElements }"
     >
       <span v-if="isRendering" class="flex items-center justify-center gap-2">
-        <span class="animate-spin">⏳</span> Rendering...
+        <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10" stroke-dasharray="45 20"/></svg>
+        Rendering...
       </span>
-      <span v-else>🎬 Render Video</span>
+      <span v-else class="flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Render Video
+      </span>
     </button>
     
     <!-- Status -->

@@ -294,10 +294,10 @@ export default {
   left: 0;
   right: 0;
   z-index: 100;
-  background: var(--studio-surface, #12121a);
-  border: 1px solid var(--studio-border, #1e1e2e);
+  background: var(--studio-surface3);
+  border: 1px solid var(--studio-border);
   border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   margin-top: 4px;
   overflow: hidden;
 }
@@ -306,8 +306,8 @@ export default {
   display: flex;
   gap: 2px;
   padding: 6px;
-  background: var(--studio-bg, #0a0a0f);
-  border-bottom: 1px solid var(--studio-border, #1e1e2e);
+  background: var(--studio-bg);
+  border-bottom: 1px solid var(--studio-border);
   overflow-x: auto;
 }
 
@@ -317,7 +317,7 @@ export default {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--studio-text-muted, #64748b);
+  color: var(--studio-text-muted);
   background: transparent;
   border: none;
   border-radius: 4px;
@@ -327,13 +327,13 @@ export default {
 }
 
 .category-tab:hover {
-  background: var(--studio-border, #1e1e2e);
-  color: var(--studio-text, #e2e8f0);
+  background: var(--studio-border);
+  color: var(--studio-text);
 }
 
 .category-tab.active {
-  background: var(--studio-accent, #6366f1);
-  color: white;
+  background: var(--studio-accent);
+  color: var(--studio-text);
 }
 
 .font-list {
@@ -352,12 +352,12 @@ export default {
 
 .font-item:hover,
 .font-item.highlighted {
-  background: var(--studio-border, #1e1e2e);
+  background: var(--studio-accent-subtle);
 }
 
 .font-item.selected {
-  background: var(--studio-accent, #6366f1);
-  color: white;
+  background: var(--studio-accent);
+  color: var(--studio-text);
 }
 
 .font-item.selected .font-category {
@@ -366,7 +366,7 @@ export default {
 
 .font-preview {
   font-size: 13px;
-  color: var(--studio-text, #e2e8f0);
+  color: var(--studio-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -374,7 +374,7 @@ export default {
 
 .font-category {
   font-size: 9px;
-  color: var(--studio-text-muted, #64748b);
+  color: var(--studio-text-muted);
   text-transform: capitalize;
   flex-shrink: 0;
   margin-left: 8px;
@@ -385,15 +385,15 @@ export default {
   padding: 20px;
   text-align: center;
   font-size: 11px;
-  color: var(--studio-text-muted, #64748b);
+  color: var(--studio-text-muted);
 }
 
 .loading-spinner {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--studio-border, #1e1e2e);
-  border-top-color: var(--studio-accent, #6366f1);
+  border: 2px solid var(--studio-border);
+  border-top-color: var(--studio-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-right: 8px;
@@ -406,24 +406,24 @@ export default {
 
 .load-more {
   padding: 6px;
-  border-top: 1px solid var(--studio-border, #1e1e2e);
-  background: var(--studio-bg, #0a0a0f);
+  border-top: 1px solid var(--studio-border);
+  background: var(--studio-bg);
 }
 
 .load-more-btn {
   width: 100%;
   padding: 6px;
   font-size: 10px;
-  color: var(--studio-accent, #6366f1);
+  color: var(--studio-accent);
   background: transparent;
-  border: 1px dashed var(--studio-border, #1e1e2e);
+  border: 1px dashed var(--studio-border);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .load-more-btn:hover {
-  background: var(--studio-border, #1e1e2e);
+  background: var(--studio-border);
   border-style: solid;
 }
 </style>

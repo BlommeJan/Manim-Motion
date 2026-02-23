@@ -90,7 +90,7 @@
         │              │              │
         ▼              ▼              ▼
 ┌──────────────┐ ┌──────────┐ ┌──────────────┐
-│    Redis     │ │  studio_data │ │   Renderer   │
+│    Redis     │ │  manim_motion_data │ │   Renderer   │
 │  (Queue)     │ │  (Volume)    │ │   (Worker)   │
 │  Port 6379   │ │  /data       │ │   (Python)   │
 └──────────────┘ └──────────┘ └──────────────┘
@@ -1718,7 +1718,7 @@ services:
   init:
     image: alpine:3.19
     volumes:
-      - studio_data:/data
+      - manim_motion_data:/data
     command: >
       sh -c "mkdir -p /data/projects /data/assets /data/renders && 
              chmod -R 777 /data && 
@@ -1747,7 +1747,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - PORT=3000
     volumes:
-      - studio_data:/data
+      - manim_motion_data:/data
     ports:
       - "3000:3000"
     depends_on:
@@ -1763,7 +1763,7 @@ services:
       - DATA_DIR=/data
       - REDIS_URL=redis://redis:6379
     volumes:
-      - studio_data:/data
+      - manim_motion_data:/data
     depends_on:
       init:
         condition: service_completed_successfully
@@ -1779,7 +1779,7 @@ services:
       - api
 
 volumes:
-  studio_data:
+  manim_motion_data:
   redis_data:
 ```
 
@@ -2277,7 +2277,7 @@ docker compose exec redis redis-cli
 
 **Inspect Data Volume:**
 ```bash
-docker run --rm -v manim-docker_studio_data:/data alpine ls -la /data
+docker run --rm -v manim_motion_manim_motion_data:/data alpine ls -la /data
 ```
 
 ---

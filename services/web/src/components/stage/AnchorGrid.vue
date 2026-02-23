@@ -46,7 +46,7 @@ export default {
   flex-direction: column;
   gap: 2px;
   padding: 4px;
-  background: var(--studio-bg, #0a0a0f);
+  background: var(--studio-bg);
   border-radius: 6px;
   width: fit-content;
 }
@@ -62,23 +62,23 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--studio-surface, #12121a);
-  border: 1px solid var(--studio-border, #1e1e2e);
+  background: var(--studio-surface);
+  border: 1px solid var(--studio-border);
   border-radius: 4px;
-  color: var(--studio-text-muted, #64748b);
+  color: var(--studio-text-muted);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .anchor-btn:hover {
-  background: var(--studio-border, #1e1e2e);
-  color: var(--studio-text, #e2e8f0);
+  background: var(--studio-border);
+  color: var(--studio-text);
 }
 
 .anchor-btn.active {
-  background: var(--studio-accent, #6366f1);
-  border-color: var(--studio-accent, #6366f1);
-  color: white;
+  background: var(--studio-accent);
+  border-color: var(--studio-accent);
+  color: var(--studio-text);
 }
 </style>
