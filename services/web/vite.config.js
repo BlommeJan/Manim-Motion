@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import vue2 from '@vitejs/plugin-vue2';
 
+const apiTarget = process.env.VITE_API_TARGET || 'http://localhost:3000';
+
 export default defineConfig({
   plugins: [vue2()],
   resolve: {
@@ -12,11 +14,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: apiTarget,
         changeOrigin: true
       },
       '/health': {
-        target: 'http://localhost:3000',
+        target: apiTarget,
         changeOrigin: true
       }
     }

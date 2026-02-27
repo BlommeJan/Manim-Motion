@@ -47,7 +47,7 @@
     {
       "id": "obj_dotgrid",
       "type": "dot_grid",
-      "name": "5x5 Grid",
+      "name": "Dot Grid",
       "x": 960,
       "y": 540,
       "width": 200,

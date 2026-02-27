@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/manim-CE-orange?logo=python&logoColor=white" alt="Manim">
   <img src="https://img.shields.io/badge/node-20-339933?logo=node.js&logoColor=white" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+  <img src="https://img.shields.io/badge/version-0.9.0-6B7280" alt="Version">
 </p>
 
 ---
@@ -42,7 +43,7 @@ Screenshots are stored in `docs/screenshots/`. Replace or add PNGs there and upd
 - **Drag-and-drop stage** -- Canvas with optional grid, resize/rotate handles, multi-select, snapping; background color and opacity configurable in the Properties panel (no selection)
 - **Light & Dark themes** -- Toggle between warm light and sleek dark palettes via View > Theme; persists across sessions
 - **Desktop-style menubar** -- File, Edit, View, Tools, Help menus with keyboard shortcuts and responsive collapse
-- **16 shape types** -- Rectangle, Square, Circle, Ellipse, Triangle, Star, Hexagon, Arrow, Heart, Line, Dot, 5x5 Grid, Text, Image, SVG, and more
+- **16 shape types** -- Rectangle, Square, Circle, Ellipse, Triangle, Star, Polygon, Arrow, Heart, Line, Dot, Dot Grid, Text, Image, SVG, and more
 - **LaTeX math objects** -- Add `MathTex` expressions (e.g. `E = mc^2`) that render natively in Manim
 - **Coordinate Axes** -- Configurable `Axes` with custom x/y ranges and tick steps
 - **Asset uploads** -- Import PNGs, JPEGs, and SVGs; drag onto the canvas from the sidebar
@@ -336,6 +337,53 @@ npm test
 For detailed technical docs of the entire codebase, see **[XTRA-BIG-README.md](XTRA-BIG-README.md)** -- includes architecture diagrams, complete API reference, data models, file-by-file breakdown, animation engine internals, compiler pipeline details, and development guide.
 
 ---
+
+## Changelog
+
+### v0.9.0 (current)
+
+- **Display-render parity**: Fixed heart scale in Manim codegen — was ~7× too large; now matches the canvas preview by normalizing x/y independently
+- **Arrow rendering**: Added `buff=0`, proportional `tip_length`, and `stroke_width` to Manim Arrow output so rendered arrows match the canvas preview
+- **Label consistency**: Renamed "5x5 Grid" / "5x5 Dot Grid" to "Dot Grid", "Hexagon" to "Polygon", "Rect" to "Rectangle" across all UI components
+- **Docker dev workflow**: Added API source bind mount with `node --watch` auto-reload; added `web-dev` service (Vite HMR) via `docker compose --profile dev up`; Vite proxy target configurable via `VITE_API_TARGET`
+- **Interface audit**: Unified type labels in PropertiesPanel, Toolbar, and AssetSidebar; added Polygon mapping to type badge
+
+### v0.8.0
+
+- **Docker & UI**: Updated Docker configuration; enhanced UI theming (light/dark themes, menubar)
+
+### v0.7.0
+
+- **Documentation**: Enhanced README and documentation with new features and updates
+
+### v0.6.0
+
+- **Style panel**: Hardened inputs with validated color picker
+- **API security**: Implemented security middleware (Helmet, rate limiting, input sanitization)
+
+### v0.5.0
+
+- **Infrastructure**: Optimized Docker Compose with resource limits and health checks
+
+### v0.4.0
+
+- **Security**: Implemented non-root Docker containers for web and API services
+
+### v0.3.0
+
+- **Documentation**: Added XTRA-BIG-README.md with architecture diagrams, API reference, data models, and development guide
+
+### v0.2.0
+
+- **Initial features**: Core editor, shapes, timeline, Manim export, Docker stack
+
+### v0.1.0
+
+- **Project bootstrap**: Vue frontend, Node.js API, Manim renderer, Redis queue
+
+### v0.0.0
+
+- **Initial commit**: Project scaffold and GitHub backup
 
 ## License
 

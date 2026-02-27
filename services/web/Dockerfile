@@ -1,5 +1,5 @@
-# Build stage
-FROM node:20-alpine AS build
+# Dependencies stage (used by both dev and production)
+FROM node:20-alpine AS deps
 
 WORKDIR /app
 
@@ -7,6 +7,10 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+# Build stage (production)
+FROM deps AS build
+
 RUN npm run build
 
 # Production stage

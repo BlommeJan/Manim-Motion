@@ -472,7 +472,7 @@ export default {
     },
     typeLabel() {
       if (!this.obj) return '';
-      const m = { dot_grid: 'Grid', svg_asset: 'SVG', rectangle: 'Rect', latex: 'LaTeX', axes: 'Axes' };
+      const m = { dot_grid: 'Dot Grid', svg_asset: 'SVG', rectangle: 'Rectangle', latex: 'LaTeX', axes: 'Axes', polygon: 'Polygon' };
       return m[this.obj.type] || this.obj.type;
     },
     typeBadge() {

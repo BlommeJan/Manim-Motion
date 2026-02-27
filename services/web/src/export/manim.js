@@ -88,13 +88,16 @@ function objCode(obj, sw, sh) {
   const hasStroke = hex(obj.stroke) !== null;
 
   switch (obj.type) {
-    case 'heart':
+    case 'heart': {
+      const mw = (obj.width / sw * 7).toFixed(3);
+      const mh = (obj.height / sh * 4).toFixed(3);
       lines.push(`${n} = ParametricFunction(`);
-      lines.push(`    lambda t: np.array([16*np.sin(t)**3, 13*np.cos(t)-5*np.cos(2*t)-2*np.cos(3*t)-np.cos(4*t), 0]) * ${(obj.width / sw * 3).toFixed(3)},`);
+      lines.push(`    lambda t: np.array([np.sin(t)**3 * ${mw}, (13*np.cos(t)-5*np.cos(2*t)-2*np.cos(3*t)-np.cos(4*t))/15 * ${mh}, 0]),`);
       lines.push(`    t_range=[0, 2*PI], color=${stroke})`);
       if (hasFill)
         lines.push(`${n}.set_fill(color=${fill}, opacity=${opacity})`);
       break;
+    }
     case 'rectangle':
       lines.push(`${n} = Rectangle(width=${(obj.width / sw * 14).toFixed(3)}, height=${(obj.height / sh * 8).toFixed(3)})`);
       if (hasFill)
@@ -153,9 +156,12 @@ function objCode(obj, sw, sh) {
       lines.push(`${n} = Line(LEFT * ${(obj.width / 2 / sw * 14).toFixed(3)}, RIGHT * ${(obj.width / 2 / sw * 14).toFixed(3)})`);
       lines.push(`${n}.set_stroke(color=${hex(obj.stroke) || hex(obj.fill) || '"#FFFFFF"'}, width=${safeNum(obj.strokeWidth, 3)})`);
       break;
-    case 'arrow':
-      lines.push(`${n} = Arrow(start=LEFT * ${(obj.width / 2 / sw * 14).toFixed(3)}, end=RIGHT * ${(obj.width / 2 / sw * 14).toFixed(3)}, color=${hex(obj.fill) || '"#EF4444"'})`);
+    case 'arrow': {
+      const halfLen = (obj.width / 2 / sw * 14).toFixed(3);
+      const tipLen = (7 / sw * 14).toFixed(3);
+      lines.push(`${n} = Arrow(start=LEFT * ${halfLen}, end=RIGHT * ${halfLen}, color=${hex(obj.fill) || '"#EF4444"'}, buff=0, tip_length=${tipLen}, stroke_width=${sw2}, max_tip_length_to_length_ratio=0.15)`);
       break;
+    }
     case 'text': {
       const fontFamily = obj.fontFamily || 'Roboto';
       lines.push(`# Font: ${fontFamily}`);
