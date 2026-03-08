@@ -14,13 +14,28 @@
         <input class="input input-sm" :value="obj.name" @change="u('name', $event.target.value)" />
       </Section>
 
-      <!-- Position & Size -->
+      <!-- Position & Size (type-aware: match what preview actually renders) -->
       <Section label="Position & Size">
         <div class="grid grid-cols-2 gap-1.5">
           <Num label="X" :value="obj.x" @input="u('x', $event)" />
           <Num label="Y" :value="obj.y" @input="u('y', $event)" />
-          <Num label="Width" :value="obj.width" :min="1" @input="u('width', $event)" />
-          <Num label="Height" :value="obj.height" :min="1" @input="u('height', $event)" />
+          <!-- Symmetric shapes: single Size (preview uses min(w,h)) -->
+          <template v-if="['circle','star','polygon','dot'].includes(obj.type)">
+            <Num label="Size" :value="effectiveSize" :min="1" class="col-span-2" @input="uSize($event)" />
+          </template>
+          <!-- Line/Arrow: Length only (height unused in preview) -->
+          <template v-else-if="['line','arrow'].includes(obj.type)">
+            <Num label="Length" :value="obj.width" :min="1" class="col-span-2" @input="u('width', $event)" />
+          </template>
+          <!-- Text: no width/height (size = fontSize) -->
+          <template v-else-if="obj.type === 'text'">
+            <!-- X,Y only; fontSize in Text Style -->
+          </template>
+          <!-- Rect-like: Width + Height -->
+          <template v-else>
+            <Num label="Width" :value="obj.width" :min="1" @input="u('width', $event)" />
+            <Num label="Height" :value="obj.height" :min="1" @input="u('height', $event)" />
+          </template>
         </div>
       </Section>
 
@@ -490,11 +505,18 @@ export default {
     clipBadge() {
       const m = { transform:'bg-purple-600 text-white', move:'bg-blue-600 text-white', scale:'bg-green-600 text-white', fade:'bg-orange-600 text-white', rotate:'bg-pink-600 text-white' };
       return m[this.clip?.type] || 'bg-gray-600 text-white';
+    },
+    /** Effective size for circle/star/polygon/dot (preview uses min(w,h)) */
+    effectiveSize() {
+      if (!this.obj) return 0;
+      return Math.min(this.obj.width || 0, this.obj.height || 0) || 1;
     }
   },
 
   methods: {
     u(k, v) { if (this.obj) actions.updateObject(this.obj.id, { [k]: v }); },
+    /** Update both width and height for symmetric shapes */
+    uSize(v) { if (this.obj) actions.updateObject(this.obj.id, { width: v, height: v }); },
     uRange(prop, idx, val) {
       if (!this.obj) return;
       const arr = [...(this.obj[prop] || (prop === 'xRange' ? [-5,5,1] : [-3,3,1]))];

@@ -458,7 +458,8 @@ export default {
     textCfg(obj) {
       const L = this.live(obj);
       const e = this.eff(obj); const p = L ? { x: L.x, y: L.y } : this.s2c(e.x, e.y);
-      const manimFontScale = (e.fontSize || 48) * this.stg.height / 768 * this.vs;
+      // Match Manim Text font_size: at 1080p, font_size N ≈ N px; scale by vs for stage→canvas
+      const manimFontScale = (e.fontSize || 48) * this.vs;
       const fontFamily = e.fontFamily || 'Arial';
       const fontStyle = (e.fontWeight === 'bold' ? 'bold ' : '') + (e.fontStyle === 'italic' ? 'italic ' : '');
       const text = e.content || 'Text';

@@ -54,11 +54,17 @@ function safeText(s) {
   return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '');
 }
 
+// Manim frame dimensions (matches Manim CE default)
+const FRAME_WIDTH = 14 + 2 / 9;   // 14.22
+const FRAME_HEIGHT = 8;
+const FRAME_X_RADIUS = FRAME_WIDTH / 2;  // 7.11
+const FRAME_Y_RADIUS = FRAME_HEIGHT / 2; // 4
+
 function stageToManim(x, y, w, h) {
-  return { x: ((x / w) - 0.5) * 14, y: -((y / h) - 0.5) * 8 };
+  return { x: ((x / w) - 0.5) * FRAME_WIDTH, y: -((y / h) - 0.5) * FRAME_HEIGHT };
 }
 function manimToStage(mx, my, w, h) {
-  return { x: (mx / 14 + 0.5) * w, y: (-my / 8 + 0.5) * h };
+  return { x: (mx / FRAME_WIDTH + 0.5) * w, y: (-my / FRAME_HEIGHT + 0.5) * h };
 }
 
 /** Check if a font is a common system font (not requiring download from Google Fonts) */
@@ -76,7 +82,7 @@ function isSystemFont(fontFamily) {
 
 function objCode(obj, sw, sh) {
   const n = v(obj.id), lines = [];
-  const scale = Math.min(obj.width, obj.height) / sw * 7;
+  const scale = Math.min(obj.width, obj.height) / sw * FRAME_WIDTH;
   const mp = stageToManim(obj.x, obj.y, sw, sh);
 
   // Helpers for this object
@@ -89,8 +95,8 @@ function objCode(obj, sw, sh) {
 
   switch (obj.type) {
     case 'heart': {
-      const mw = (obj.width / sw * 7).toFixed(3);
-      const mh = (obj.height / sh * 4).toFixed(3);
+      const mw = (obj.width / sw * FRAME_X_RADIUS).toFixed(3);
+      const mh = (obj.height / sh * FRAME_Y_RADIUS).toFixed(3);
       lines.push(`${n} = ParametricFunction(`);
       lines.push(`    lambda t: np.array([np.sin(t)**3 * ${mw}, (13*np.cos(t)-5*np.cos(2*t)-2*np.cos(3*t)-np.cos(4*t))/15 * ${mh}, 0]),`);
       lines.push(`    t_range=[0, 2*PI], color=${stroke})`);
@@ -99,7 +105,7 @@ function objCode(obj, sw, sh) {
       break;
     }
     case 'rectangle':
-      lines.push(`${n} = Rectangle(width=${(obj.width / sw * 14).toFixed(3)}, height=${(obj.height / sh * 8).toFixed(3)})`);
+      lines.push(`${n} = Rectangle(width=${(obj.width / sw * FRAME_WIDTH).toFixed(3)}, height=${(obj.height / sh * FRAME_HEIGHT).toFixed(3)})`);
       if (hasFill)
         lines.push(`${n}.set_fill(color=${fill}, opacity=${opacity})`);
       if (hasStroke)
@@ -120,7 +126,7 @@ function objCode(obj, sw, sh) {
         lines.push(`${n}.set_stroke(color=${stroke}, width=${sw2})`);
       break;
     case 'ellipse':
-      lines.push(`${n} = Ellipse(width=${(obj.width / sw * 14).toFixed(3)}, height=${(obj.height / sh * 8).toFixed(3)})`);
+      lines.push(`${n} = Ellipse(width=${(obj.width / sw * FRAME_WIDTH).toFixed(3)}, height=${(obj.height / sh * FRAME_HEIGHT).toFixed(3)})`);
       if (hasFill)
         lines.push(`${n}.set_fill(color=${fill}, opacity=${opacity})`);
       if (hasStroke)
@@ -153,12 +159,12 @@ function objCode(obj, sw, sh) {
       break;
     }
     case 'line':
-      lines.push(`${n} = Line(LEFT * ${(obj.width / 2 / sw * 14).toFixed(3)}, RIGHT * ${(obj.width / 2 / sw * 14).toFixed(3)})`);
+      lines.push(`${n} = Line(LEFT * ${(obj.width / 2 / sw * FRAME_WIDTH).toFixed(3)}, RIGHT * ${(obj.width / 2 / sw * FRAME_WIDTH).toFixed(3)})`);
       lines.push(`${n}.set_stroke(color=${hex(obj.stroke) || hex(obj.fill) || '"#FFFFFF"'}, width=${safeNum(obj.strokeWidth, 3)})`);
       break;
     case 'arrow': {
-      const halfLen = (obj.width / 2 / sw * 14).toFixed(3);
-      const tipLen = (7 / sw * 14).toFixed(3);
+      const halfLen = (obj.width / 2 / sw * FRAME_WIDTH).toFixed(3);
+      const tipLen = (FRAME_X_RADIUS / sw * FRAME_WIDTH).toFixed(3);
       lines.push(`${n} = Arrow(start=LEFT * ${halfLen}, end=RIGHT * ${halfLen}, color=${hex(obj.fill) || '"#EF4444"'}, buff=0, tip_length=${tipLen}, stroke_width=${sw2}, max_tip_length_to_length_ratio=0.15)`);
       break;
     }
@@ -169,20 +175,20 @@ function objCode(obj, sw, sh) {
       break;
     }
     case 'dot':
-      lines.push(`${n} = Dot(radius=${(obj.width / 2 / sw * 7).toFixed(3)}, color=${fill})`);
+      lines.push(`${n} = Dot(radius=${(obj.width / 2 / sw * FRAME_X_RADIUS).toFixed(3)}, color=${fill})`);
       break;
     case 'dot_grid': {
-      const c = safeNum(obj.gridCols, 5), r = safeNum(obj.gridRows, 5), sp = safeNum(obj.dotSpacing, 40) / sw * 7;
+      const c = safeNum(obj.gridCols, 5), r = safeNum(obj.gridRows, 5), sp = safeNum(obj.dotSpacing, 40) / sw * FRAME_WIDTH;
       lines.push(`${n} = VGroup(*[Dot(radius=0.06).move_to([c*${sp.toFixed(3)}-${((c - 1) * sp / 2).toFixed(3)}, r*${sp.toFixed(3)}-${((r - 1) * sp / 2).toFixed(3)}, 0]) for r in range(${r}) for c in range(${c})])`);
       if (hasFill)
         lines.push(`${n}.set_color(${fill})`);
       break;
     }
     case 'image':
-      lines.push(`${n} = ImageMobject("${obj.name || 'image'}.png").scale_to_fit_width(${(obj.width / sw * 14).toFixed(3)})`);
+      lines.push(`${n} = ImageMobject("${obj.name || 'image'}.png").scale_to_fit_width(${(obj.width / sw * FRAME_WIDTH).toFixed(3)})`);
       break;
     case 'svg_asset':
-      lines.push(`${n} = SVGMobject("${obj.name || 'asset'}.svg").scale_to_fit_width(${(obj.width / sw * 14).toFixed(3)})`);
+      lines.push(`${n} = SVGMobject("${obj.name || 'asset'}.svg").scale_to_fit_width(${(obj.width / sw * FRAME_WIDTH).toFixed(3)})`);
       break;
     case 'latex': {
       const texStr = (obj.latex || 'E = mc^2').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -193,7 +199,7 @@ function objCode(obj, sw, sh) {
     case 'axes': {
       const xr = obj.xRange || [-5, 5, 1];
       const yr = obj.yRange || [-3, 3, 1];
-      lines.push(`${n} = Axes(x_range=[${xr[0]}, ${xr[1]}, ${xr[2]}], y_range=[${yr[0]}, ${yr[1]}, ${yr[2]}], x_length=${(obj.width / sw * 14).toFixed(1)}, y_length=${(obj.height / sh * 8).toFixed(1)}, tips=True)`);
+      lines.push(`${n} = Axes(x_range=[${xr[0]}, ${xr[1]}, ${xr[2]}], y_range=[${yr[0]}, ${yr[1]}, ${yr[2]}], x_length=${(obj.width / sw * FRAME_WIDTH).toFixed(1)}, y_length=${(obj.height / sh * FRAME_HEIGHT).toFixed(1)}, tips=True)`);
       break;
     }
     default:
@@ -488,7 +494,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*Square\(side_length=([\d.]+)\)/);
     if (m) {
       const [, name, sl] = m;
-      const size = Math.round(parseFloat(sl) / 7 * sw);
+      const size = Math.round(parseFloat(sl) / FRAME_WIDTH * sw);
       const id = uid('obj');
       const obj = { id, type: 'square', name, x: sw / 2, y: sh / 2, width: size, height: size, fill: '#ffffff', stroke: 'transparent', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -500,7 +506,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     if (m) {
       const [, name, w, h] = m;
       const id = uid('obj');
-      const obj = { id, type: 'rectangle', name, x: sw / 2, y: sh / 2, width: Math.round(parseFloat(w) / 14 * sw), height: Math.round(parseFloat(h) / 8 * sh), fill: '#ffffff', stroke: 'transparent', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
+      const obj = { id, type: 'rectangle', name, x: sw / 2, y: sh / 2, width: Math.round(parseFloat(w) / FRAME_WIDTH * sw), height: Math.round(parseFloat(h) / FRAME_HEIGHT * sh), fill: '#ffffff', stroke: 'transparent', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
       continue;
     }
@@ -509,7 +515,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*Circle\(radius=([\d.]+)\)/);
     if (m) {
       const [, name, r] = m;
-      const size = Math.round(parseFloat(r) * 2 / 7 * sw);
+      const size = Math.round(parseFloat(r) * 2 / FRAME_WIDTH * sw);
       const id = uid('obj');
       const obj = { id, type: 'circle', name, x: sw / 2, y: sh / 2, width: size, height: size, fill: '#ffffff', stroke: 'transparent', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -521,7 +527,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     if (m) {
       const [, name, w, h] = m;
       const id = uid('obj');
-      const obj = { id, type: 'ellipse', name, x: sw / 2, y: sh / 2, width: Math.round(parseFloat(w) / 14 * sw), height: Math.round(parseFloat(h) / 8 * sh), fill: '#ffffff', stroke: 'transparent', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
+      const obj = { id, type: 'ellipse', name, x: sw / 2, y: sh / 2, width: Math.round(parseFloat(w) / FRAME_WIDTH * sw), height: Math.round(parseFloat(h) / FRAME_HEIGHT * sh), fill: '#ffffff', stroke: 'transparent', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
       continue;
     }
@@ -530,7 +536,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*Triangle\(\)\.scale\(([\d.]+)\)/);
     if (m) {
       const [, name, sc] = m;
-      const size = Math.round(parseFloat(sc) / 7 * sw);
+      const size = Math.round(parseFloat(sc) / FRAME_WIDTH * sw);
       const id = uid('obj');
       const obj = { id, type: 'triangle', name, x: sw / 2, y: sh / 2, width: size, height: size, fill: '#f59e0b', stroke: '#ffffff', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -541,7 +547,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*Star\(n=(\d+),\s*outer_radius=([\d.]+),\s*inner_radius=([\d.]+)\)/);
     if (m) {
       const [, name, arms, outerR, innerR] = m;
-      const size = Math.round(parseFloat(outerR) * 2 / 7 * sw);
+      const size = Math.round(parseFloat(outerR) * 2 / FRAME_WIDTH * sw);
       const id = uid('obj');
       const obj = { id, type: 'star', name, x: sw / 2, y: sh / 2, width: size, height: size, starArms: parseInt(arms), innerRatio: parseFloat(innerR) / parseFloat(outerR), fill: '#eab308', stroke: '#ffffff', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -552,7 +558,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*RegularPolygon\(n=(\d+)\)\.scale\(([\d.]+)\)/);
     if (m) {
       const [, name, sides, sc] = m;
-      const size = Math.round(parseFloat(sc) * 2 / 7 * sw);
+      const size = Math.round(parseFloat(sc) * 2 / FRAME_WIDTH * sw);
       const id = uid('obj');
       const obj = { id, type: 'polygon', name, x: sw / 2, y: sh / 2, width: size, height: size, sides: parseInt(sides), fill: '#8b5cf6', stroke: '#ffffff', strokeWidth: 2, opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -569,11 +575,11 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
       continue;
     }
 
-    // Dot
+    // Dot (radius in export uses FRAME_X_RADIUS: radius = obj.width/2/sw * FRAME_X_RADIUS)
     m = line.match(/^(\w+)\s*=\s*Dot\((?:radius=([\d.]+))?[^)]*(?:color=["']([^"']+)["'])?\)/);
     if (m) {
       const [, name, r, color] = m;
-      const size = r ? Math.round(parseFloat(r) * 2 / 7 * sw) : 20;
+      const size = r ? Math.round(parseFloat(r) * 2 / FRAME_X_RADIUS * sw) : 20;
       const id = uid('obj');
       const obj = { id, type: 'dot', name, x: sw / 2, y: sh / 2, width: size, height: size, fill: color || '#ffffff', opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -593,7 +599,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*ImageMobject\(["']([^"']+)["']\)(?:\.scale_to_fit_width\(([\d.]+)\))?/);
     if (m) {
       const [, name, path, w] = m;
-      const width = w ? Math.round(parseFloat(w) / 14 * sw) : 200;
+      const width = w ? Math.round(parseFloat(w) / FRAME_WIDTH * sw) : 200;
       const id = uid('obj');
       const obj = { id, type: 'image', name, x: sw / 2, y: sh / 2, width, height: Math.round(width * 0.75), fill: '#ffffff', opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
@@ -604,7 +610,7 @@ export function parseManimScript(code, sw = 1920, sh = 1080) {
     m = line.match(/^(\w+)\s*=\s*SVGMobject\(["']([^"']+)["']\)(?:\.scale_to_fit_width\(([\d.]+)\))?/);
     if (m) {
       const [, name, path, w] = m;
-      const width = w ? Math.round(parseFloat(w) / 14 * sw) : 200;
+      const width = w ? Math.round(parseFloat(w) / FRAME_WIDTH * sw) : 200;
       const id = uid('obj');
       const obj = { id, type: 'svg_asset', name, x: sw / 2, y: sh / 2, width, height: Math.round(width * 0.75), fill: '#ffffff', opacity: 1, rotation: 0, enterTime: 0, duration: 10, enterAnim: 'fade_in', exitAnim: 'fade_out', zOrder: objects.length };
       objects.push(obj); varMap[name] = id; objById[id] = obj;
