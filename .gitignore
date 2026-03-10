@@ -6,6 +6,12 @@ node_modules/
 .env.local
 *.local
 
+# Claude Code worktrees
+.claude/
+.claude/*
+.cursor/
+.cursor/*
+
 # Build / cache
 dist/
 .vite/

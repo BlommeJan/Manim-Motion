@@ -12,7 +12,7 @@ export function useReveal() {
           observer.unobserve(entry.target)
         }
       })
-    }, { threshold: 0.12 })
+    }, { threshold: 0.12, rootMargin: '0px 0px 100px 0px' })
     els.forEach(el => observer.observe(el))
   })
 

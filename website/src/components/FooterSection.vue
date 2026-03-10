@@ -1,26 +1,24 @@
 <template>
   <footer>
     <div class="footer-left">
-      <div class="nav-logo">
-        <div class="nav-logo-badge">M</div>
-        Manim Motion Editor
-      </div>
+      <a href="#top" class="footer-logo" aria-label="Manim Motion — scroll to top">
+        <img src="/logo.svg" alt="Manim Motion" class="footer-logo-img" />
+        <span class="footer-logo-text">Manim Motion</span>
+      </a>
       <p>
-        A Figma-like visual interface<br>
-        for the Manim animation engine.<br>
-        MIT Licensed. Open Source.
+        A Figma-like visual interface for the Manim animation engine.<br>
+        Clone from GitHub, run with Docker. MIT Licensed.
       </p>
     </div>
     <div class="footer-center">
-      <p style="font-size:28px; font-family:var(--font-head); font-weight:800; letter-spacing:-0.04em; color:rgba(59,130,246,0.3);">∫ dt</p>
-      <p>© 2025 Manim Motion Editor</p>
+      <p>© 2025 Manim Motion</p>
       <p>Built with Vue · Konva · Manim · Docker</p>
     </div>
     <ul class="footer-links">
-      <li><a href="#">Docs</a></li>
-      <li><a href="https://github.com/BlommeJan/Manim-Motion" target="_blank">GitHub</a></li>
-      <li><a href="#">License</a></li>
-      <li><a href="#">Changelog</a></li>
+      <li><a href="https://github.com/BlommeJan/Manim-Motion#readme" target="_blank" rel="noopener noreferrer">Docs</a></li>
+      <li><a href="https://github.com/BlommeJan/Manim-Motion" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+      <li><a href="https://github.com/BlommeJan/Manim-Motion/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
+      <li><a href="https://github.com/BlommeJan/Manim-Motion/releases" target="_blank" rel="noopener noreferrer">Releases</a></li>
     </ul>
   </footer>
 </template>

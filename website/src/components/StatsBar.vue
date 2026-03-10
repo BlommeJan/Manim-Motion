@@ -6,8 +6,8 @@
         <div class="stat-label">Shape Primitives</div>
       </div>
       <div class="stat-item reveal reveal-delay-1">
-        <div class="stat-num">60</div>
-        <div class="stat-label">Frames per Second</div>
+        <div class="stat-num">5</div>
+        <div class="stat-label">Timeline Tracks</div>
       </div>
       <div class="stat-item reveal reveal-delay-2">
         <div class="stat-num">17</div>

@@ -11,6 +11,7 @@ import { onMounted, onUnmounted } from 'vue'
 let rafId = null
 let mousemoveHandler = null
 let resizeHandler = null
+let visibilityHandler = null
 
 onMounted(() => {
   const canvas = document.getElementById('shader-canvas')
@@ -168,7 +169,9 @@ onMounted(() => {
   window.addEventListener('resize', resizeHandler)
   resize()
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const startTime = performance.now()
+
   function render() {
     const t = (performance.now() - startTime) * 0.001
     gl.uniform1f(uTime, t)
@@ -177,12 +180,36 @@ onMounted(() => {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     rafId = requestAnimationFrame(render)
   }
-  render()
+
+  function renderOnce() {
+    gl.uniform1f(uTime, 0)
+    gl.uniform2f(uRes, canvas.width, canvas.height)
+    gl.uniform2f(uMouse, mx, my)
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+  }
+
+  if (prefersReducedMotion) {
+    renderOnce()
+  } else {
+    visibilityHandler = () => {
+      if (document.hidden) {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId)
+          rafId = null
+        }
+      } else {
+        if (rafId === null) render()
+      }
+    }
+    document.addEventListener('visibilitychange', visibilityHandler)
+    if (!document.hidden) render()
+  }
 })
 
 onUnmounted(() => {
   if (rafId !== null) cancelAnimationFrame(rafId)
   if (mousemoveHandler) document.removeEventListener('mousemove', mousemoveHandler)
   if (resizeHandler) window.removeEventListener('resize', resizeHandler)
+  if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler)
 })
 </script>

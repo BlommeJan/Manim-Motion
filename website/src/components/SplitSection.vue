@@ -1,10 +1,10 @@
 <template>
-  <section id="editor" class="split-section">
+  <section id="interface" class="split-section">
     <div class="split-container">
       <div class="split-header reveal">
         <div class="section-eyebrow">02 — The Hybrid Interface</div>
         <h2 class="section-title">Canvas Meets<br><em>Code</em></h2>
-        <p style="font-family:var(--font-mono); font-size:13px; font-weight:300; color:var(--latex-dim); margin-top:20px; max-width:560px; line-height:1.8;">
+        <p class="split-intro">
           Drag a shape on the left — Python appears on the right. Every property,
           every keyframe, every morph — all rendered as clean, production-ready Manim
           code you own completely.
@@ -27,9 +27,9 @@
               <div class="canvas-tool" title="Rectangle">▭</div>
               <div class="canvas-tool" title="Circle">○</div>
               <div class="canvas-tool" title="Text">T</div>
-              <div class="canvas-tool" title="LaTeX" style="font-size:10px; padding:0 6px;">∑</div>
-              <div style="flex:1"></div>
-              <div style="font-family:var(--font-mono);font-size:10px;color:var(--latex-dim);letter-spacing:0.1em;">2 objects</div>
+              <div class="canvas-tool" title="LaTeX">∑</div>
+              <div class="flex-1"></div>
+              <div class="panel-meta">2 objects</div>
             </div>
             <div class="canvas-stage">
               <div class="canvas-obj canvas-obj-1">
@@ -48,7 +48,7 @@
         <div class="split-divider"></div>
 
         <!-- Code Panel -->
-        <div class="split-panel" style="background:var(--deep);">
+        <div class="split-panel split-panel--code">
           <div class="panel-header">
             <div class="panel-dot panel-dot-r"></div>
             <div class="panel-dot panel-dot-y"></div>
@@ -116,6 +116,7 @@ function renderCode() {
     ln.className = 'ln'; ln.textContent = String(i + 1).padStart(2, ' ')
     row.appendChild(ln)
     const content = document.createElement('span')
+    content.className = 'code-content'
     line.tokens.forEach(tok => {
       const span = document.createElement('span')
       span.className = tok.t ? `code-${tok.t}` : 'code-var'
@@ -141,8 +142,8 @@ onMounted(() => {
       setTimeout(() => {
         lines[idx].style.animation = ''
         lines[idx].style.opacity = '1'
-        lines[idx].style.color = 'var(--acid)'
-        setTimeout(() => { lines[idx].style.color = '' }, 600)
+        lines[idx].classList.add('code-line-highlight')
+        setTimeout(() => { lines[idx].classList.remove('code-line-highlight') }, 600)
       }, 100)
     }
   }, 2200)

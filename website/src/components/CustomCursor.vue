@@ -23,8 +23,7 @@ onMounted(() => {
   function animateRing() {
     ringX += (dotX - ringX) * 0.12
     ringY += (dotY - ringY) * 0.12
-    cursorRing.style.left = ringX + 'px'
-    cursorRing.style.top = ringY + 'px'
+    cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`
     rafId = requestAnimationFrame(animateRing)
   }
   animateRing()

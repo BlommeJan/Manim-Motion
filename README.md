@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/manim-CE-orange?logo=python&logoColor=white" alt="Manim">
   <img src="https://img.shields.io/badge/node-20-339933?logo=node.js&logoColor=white" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
-  <img src="https://img.shields.io/badge/version-0.9.1-6B7280" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.11.0-6B7280" alt="Version">
 </p>
 
 ---
@@ -52,13 +52,13 @@ Screenshots are stored in `docs/screenshots/`. Replace or add PNGs there and upd
 - **Multi-track timeline** -- Up to 5 tracks with draggable, resizable animation clips
 - **Transform morphing** -- Select two shapes and morph between them with customizable easing
 - **Animation types** -- Transform, Move, Scale, Fade, Rotate with 17 easing functions
-- **60fps preview** -- Real-time playback with sub-frame interpolation
+- **Timeline scrubbing** -- Arrange and trim clips; render to video via Docker
 - **Entrance / exit animations** -- 11 entrance and 9 exit animation presets per object
 
 ### Workflow
 - **Undo / Redo** -- Full history stack (Ctrl+Z / Ctrl+Shift+Z) with 50-state memory
 - **Copy / Paste** -- Duplicate objects with offset (Ctrl+C / Ctrl+V)
-- **Live Code view** -- Generated Manim Python with syntax highlighting; edit, apply to canvas, copy, or download `.py`
+- **Generated Code view** -- Manim Python generated from your canvas; edit, copy, or download `.py`
 - **Server rendering** -- One-click HQ render via Docker (480p to 4K) with progress tracking
 - **Project management** -- Save/load locally (JSON) or sync to Docker server
 
@@ -84,7 +84,11 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. You can edit, preview, and export Manim scripts. Server features (render, project sync) require Docker.
+Open **http://localhost:5173**. You can build scenes and export Manim scripts. Server features (render, project sync) require Docker.
+
+### Deploy Website (Netlify)
+
+The marketing site in `website/` deploys to Netlify via `netlify.toml`. Connect the repo to Netlify; build settings are read from the config (base: `website`, publish: `dist`).
 
 ---
 
@@ -100,7 +104,7 @@ Browser (localhost:8080)
   |     |-- Properties Panel (object/clip editing)
   |     |-- Timeline (multi-track, drag clips)
   |     |-- Asset Sidebar (shapes, uploads)
-  |     |-- Playback Engine (60fps rAF)
+  |     |-- Timeline (multi-track, clips)
   |     |-- Manim Exporter (client-side .py generation)
   |
   |-- /api/ --> Node.js + Express (port 3000)
@@ -142,14 +146,14 @@ Drag shapes on the canvas. Edit fill, stroke, opacity, size, rotation in the Pro
 - Resize clip edges to change duration
 - Click clips to edit easing, overshoot, morph quality
 
-### 5. Preview
-Press **Space** to play the animation at 60fps. Scrub the timeline ruler to seek.
+### 5. Generated Code
+Click the **Code** tab to see the Manim Python generated from your canvas. Copy or download the `.py` file. Scrub the timeline to review your edit structure.
 
 ### 6. Render
-Click **Tools > Render HQ** in the menubar. Choose quality (Low/Medium/High/4K) and click Start Render. The project is saved to the server, compiled to a Manim scene, and rendered. When done, watch the preview and download the MP4.
+Click **Tools > Render HQ** in the menubar. Choose quality (Low/Medium/High/4K) and click Start Render. The project is saved to the server, compiled to a Manim scene, and rendered. When done, watch and download the MP4.
 
-### 7. Live Code View
-Click the **Code** tab to see the generated Manim Python with syntax highlighting. Edit the code and click **Apply to Canvas** to update the scene, or copy/download the `.py` file.
+### 7. Code View & Export
+The **Code** tab shows the generated Manim Python with syntax highlighting. Edit the code if needed, or copy/download the `.py` file to use elsewhere.
 
 ### 8. Export
 Click **File > Export .py** to download a standalone `scene.py` you can run locally with `manim -qh scene.py MainScene`.
@@ -340,7 +344,15 @@ For detailed technical docs of the entire codebase, see **[XTRA-BIG-README.md](X
 
 ## Changelog
 
-### v0.9.1 (current)
+### v0.11.0 (current)
+
+- **Deployment**: Added `netlify.toml` for one-click Netlify deployment of the marketing website
+
+### v0.10.0
+
+- **Website**: Accessibility (drawer focus trap, cursor fallback, reduced-motion), marquee gradient refinement, inline styles cleanup, shader pause on reduced-motion and tab visibility, font preload, animation easing (ease-out-quart), code panel indentation fix, removed GitHub nav link
+
+### v0.9.1
 
 - **Preview-render alignment**: Fixed Manim coordinate mapping to use official frame dimensions (14.22×8); scale-based shapes (square, circle, star, polygon, etc.) now match final render
 - **Properties panel**: Size params now match preview — symmetric shapes show single "Size", line/arrow show "Length", text omits width/height

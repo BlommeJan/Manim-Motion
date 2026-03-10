@@ -20,7 +20,7 @@
           and precise z-ordering.
         </p>
         <span class="card-tag">Drag &amp; Drop</span>
-        <span class="card-tag" style="margin-left:8px; border-color:rgba(59,130,246,0.3); color:var(--blueprint); background:var(--blueprint-dim);">16+ Shapes</span>
+        <span class="card-tag card-tag-blue">16+ Shapes</span>
       </div>
 
       <!-- Card 2: Cinematic Morphing -->
@@ -50,15 +50,15 @@
         <div class="card-icon">⏱</div>
         <div class="card-title">Multi-track Timeline</div>
         <p class="card-desc">
-          Up to 5 independent tracks with draggable, resizable clips
-          and 60fps real-time preview.
+          Up to 5 independent tracks with draggable, resizable clips.
+          Set timing, easing, and duration — then render to video via Docker.
         </p>
         <div class="mini-timeline">
           <div class="tl-track"><div class="tl-clip tl-clip-1"></div></div>
           <div class="tl-track"><div class="tl-clip tl-clip-2"></div></div>
           <div class="tl-track"><div class="tl-clip tl-clip-3"></div></div>
         </div>
-        <span class="card-tag">60fps</span>
+        <span class="card-tag">5 Tracks</span>
       </div>
 
       <!-- Card 4: LaTeX Integration -->
@@ -81,15 +81,15 @@
         <div class="card-icon">⌨</div>
         <div class="card-title">Hybrid Workflow</div>
         <p class="card-desc">
-          Every visual edit reflects instantly in the Live Code View —
-          syntax-highlighted Manim Python you can edit, copy, or export
-          as a standalone <span style="color:var(--acid); font-family:var(--font-mono);">scene.py</span>.
-          Visual and code-first workflows in perfect sync.
+          Your composition is generated as Manim Python — syntax-highlighted
+          code you can edit, copy, or export as a standalone
+          <span class="text-accent">scene.py</span>.
+          Build visually, then render to cinema-quality video with one click.
         </p>
-        <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
-          <span class="card-tag">Live Code View</span>
-          <span class="card-tag" style="border-color:rgba(59,130,246,0.3); color:var(--blueprint); background:var(--blueprint-dim);">Export .py</span>
-          <span class="card-tag" style="border-color:rgba(248,250,252,0.2); color:var(--latex-dim); background:rgba(248,250,252,0.05);">Docker Render</span>
+        <div class="flex-center-wrap flex-center-wrap--sm">
+          <span class="card-tag">Generated Code</span>
+          <span class="card-tag card-tag-blue">Export .py</span>
+          <span class="card-tag card-tag-muted">Docker Render</span>
         </div>
       </div>
 
