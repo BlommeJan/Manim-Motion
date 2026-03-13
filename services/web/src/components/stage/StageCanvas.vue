@@ -589,10 +589,25 @@ export default {
     handleStageMouseDown(e) {
       const t = e.target; const s = this.$refs.konvaStage?.getNode();
       if (!s) return;
-      // Click on transformer (resize/rotate handles or border) — do not deselect; let transformer handle it
+      const ev = e.evt;
+      const addToSel = ev && (ev.shiftKey || ev.ctrlKey || ev.metaKey);
+      // Click on transformer (resize/rotate handles or border) — handle shift-click to add object underneath
       let node = t;
       while (node) {
-        if (node.className === 'Transformer') return;
+        if (node.className === 'Transformer') {
+          if (addToSel) {
+            const layer = this.$refs.objectsLayer?.getNode?.();
+            const pos = s.getPointerPosition?.();
+            if (layer && pos) {
+              const hit = layer.getIntersection?.(pos);
+              if (hit && hit.name?.() === 'stageObject' && hit.id?.()) {
+                actions.selectObject(hit.id(), true);
+                this.$nextTick(() => this.$nextTick(() => this.updateTransformer()));
+              }
+            }
+          }
+          return;
+        }
         node = node.getParent ? node.getParent() : null;
       }
       if (t === s || t.name() !== 'stageObject') {
