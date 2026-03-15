@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/manim-CE-orange?logo=python&logoColor=white" alt="Manim">
   <img src="https://img.shields.io/badge/node-20-339933?logo=node.js&logoColor=white" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
-  <img src="https://img.shields.io/badge/version-0.11.1-6B7280" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.0.1-6B7280" alt="Version">
 </p>
 
 ---
@@ -69,8 +69,8 @@ Screenshots are stored in `docs/screenshots/`. Replace or add PNGs there and upd
 ### Full Stack with Docker (Recommended)
 
 ```bash
-git clone <repository-url>
-cd Manim-docker
+git clone https://github.com/BlommeJan/Manim-Motion.git
+cd Manim-Motion
 docker compose up --build
 ```
 
@@ -344,7 +344,15 @@ For detailed technical docs of the entire codebase, see **[XTRA-BIG-README.md](X
 
 ## Changelog
 
-### v0.11.1 (current)
+### v1.0.1 (current)
+
+- **Fix**: Corrected `git clone` command in README to use the actual repository URL and correct directory name
+
+### v1.0.0
+
+- **Version bump**: Project version set to 1.0.0
+
+### v0.11.1
 
 - **Stage canvas**: Fixed shift-click multi-select when the selection transformer overlaps another object (e.g. dot + heart); now queries the objects layer for the shape under the cursor and adds it to selection
 
