@@ -691,16 +691,16 @@ export default {
 /* Python syntax highlighting (theme-aware) */
 .code-highlight-mirror .hljs-keyword,
 .code-highlight-mirror .hljs-selector-tag,
-.code-highlight-mirror .hljs-built_in { color: var(--studio-accent); }
-.code-highlight-mirror .hljs-string { color: var(--studio-success); }
-.code-highlight-mirror .hljs-number { color: var(--studio-warning); }
-.code-highlight-mirror .hljs-comment { color: var(--studio-text-muted); font-style: italic; }
+.code-highlight-mirror .hljs-built_in { color: var(--studio-code-keyword); }
+.code-highlight-mirror .hljs-string { color: var(--studio-code-string); }
+.code-highlight-mirror .hljs-number { color: var(--studio-code-number); }
+.code-highlight-mirror .hljs-comment { color: var(--studio-code-comment); font-style: italic; }
 .code-highlight-mirror .hljs-title.class_,
-.code-highlight-mirror .hljs-title.function_ { color: var(--studio-accent); }
+.code-highlight-mirror .hljs-title.function_ { color: var(--studio-code-function); }
 .code-highlight-mirror .hljs-params,
 .code-highlight-mirror .hljs-attr { color: var(--studio-text); }
 .code-highlight-mirror .hljs-meta,
-.code-highlight-mirror .hljs-doctag { color: var(--studio-text-muted); }
+.code-highlight-mirror .hljs-doctag { color: var(--studio-code-comment); }
 .code-highlight-mirror .hljs-literal,
 .code-highlight-mirror .hljs-name { color: var(--studio-text); }
 </style>

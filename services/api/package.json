@@ -1,6 +1,6 @@
 {
   "name": "manim-motion-api",
-  "version": "0.11.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
