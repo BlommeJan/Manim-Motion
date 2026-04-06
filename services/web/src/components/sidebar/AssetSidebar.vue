@@ -1,7 +1,7 @@
 <template>
   <aside class="w-56 bg-studio-surface border-r border-studio-border flex flex-col flex-shrink-0 overflow-y-auto">
-    <!-- ═══ Shapes ═══ -->
-    <div class="p-3 border-b border-studio-border">
+    <!-- ═══ Shapes (visual mode only) ═══ -->
+    <div v-if="!isCodeMode" class="p-3 border-b border-studio-border">
       <h3 class="section-title">Shapes</h3>
       <div class="grid grid-cols-3 gap-1.5">
         <button
@@ -22,8 +22,8 @@
       </div>
     </div>
 
-    <!-- ═══ Text ═══ -->
-    <div class="p-3 border-b border-studio-border">
+    <!-- ═══ Text (visual mode only) ═══ -->
+    <div v-if="!isCodeMode" class="p-3 border-b border-studio-border">
       <h3 class="section-title">Text</h3>
       <button
         class="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-studio-bg hover:bg-studio-border cursor-pointer border border-transparent hover:border-studio-accent/30 transition-all text-left"
@@ -43,6 +43,14 @@
       </button>
       <p class="text-[9px] mt-1.5 leading-relaxed" style="color: var(--studio-warning); opacity: 0.7;">
         Note: Text size on canvas may differ from the final render.
+      </p>
+    </div>
+
+    <!-- ═══ Code mode hint ═══ -->
+    <div v-if="isCodeMode" class="p-3 border-b border-studio-border">
+      <h3 class="section-title">Assets</h3>
+      <p class="text-[10px] leading-relaxed" style="color: var(--studio-text-muted);">
+        Upload images below. Click the <strong>copy path</strong> button to get a Manim-ready file reference for your code.
       </p>
     </div>
 
@@ -66,14 +74,17 @@
           v-for="asset in imageAssets"
           :key="asset.id"
           class="asset-thumb group"
-          draggable="true"
-          @dragstart="onDragStartAsset(asset.id, $event)"
+          :draggable="!isCodeMode"
+          @dragstart="!isCodeMode && onDragStartAsset(asset.id, $event)"
           @dragend="onDragEnd"
-          @click="addAssetToStage(asset.id)"
-          :title="'Drag or click to add ' + asset.name"
+          @click="onAssetClick(asset)"
+          :title="isCodeMode ? 'Click to copy file path' : 'Drag or click to add ' + asset.name"
         >
           <img :src="asset.dataUrl" :alt="asset.name" class="w-full h-14 object-contain rounded" />
           <span class="asset-label">{{ asset.name }}</span>
+          <button v-if="isCodeMode" class="asset-copy-path" @click.stop="copyAssetPath(asset)" title="Copy file path">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
           <button class="asset-remove" @click.stop="removeAsset(asset.id)" title="Remove">&times;</button>
         </div>
       </div>
@@ -102,14 +113,17 @@
           v-for="asset in svgAssets"
           :key="asset.id"
           class="asset-thumb group"
-          draggable="true"
-          @dragstart="onDragStartAsset(asset.id, $event)"
+          :draggable="!isCodeMode"
+          @dragstart="!isCodeMode && onDragStartAsset(asset.id, $event)"
           @dragend="onDragEnd"
-          @click="addAssetToStage(asset.id)"
-          :title="'Drag or click to add ' + asset.name"
+          @click="onAssetClick(asset)"
+          :title="isCodeMode ? 'Click to copy file path' : 'Drag or click to add ' + asset.name"
         >
           <img :src="asset.dataUrl" :alt="asset.name" class="w-full h-14 object-contain rounded" />
           <span class="asset-label">{{ asset.name }}</span>
+          <button v-if="isCodeMode" class="asset-copy-path" @click.stop="copyAssetPath(asset)" title="Copy file path">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
           <button class="asset-remove" @click.stop="removeAsset(asset.id)" title="Remove">&times;</button>
         </div>
       </div>
@@ -118,8 +132,8 @@
       </div>
     </div>
 
-    <!-- ═══ Transform action ═══ -->
-    <div class="p-3 mt-auto border-t border-studio-border">
+    <!-- ═══ Transform action (visual mode only) ═══ -->
+    <div v-if="!isCodeMode" class="p-3 mt-auto border-t border-studio-border">
       <button
         class="w-full btn-transform"
         :class="{ active: canTransform }"
@@ -167,6 +181,7 @@ export default {
     assets() { return store.project.assets; },
     imageAssets() { return this.assets.filter(a => a.type === 'image'); },
     svgAssets() { return this.assets.filter(a => a.type === 'svg'); },
+    isCodeMode() { return store.project.editorMode === 'code'; },
     canTransform() { return store.selectedObjectIds.length === 2; }
   },
 
@@ -222,6 +237,22 @@ export default {
       e.target.value = '';
     },
 
+    onAssetClick(asset) {
+      if (this.isCodeMode) {
+        this.copyAssetPath(asset);
+      } else {
+        this.addAssetToStage(asset.id);
+      }
+    },
+
+    copyAssetPath(asset) {
+      const filename = asset.serverFilename || asset.filename || asset.name;
+      const snippet = `"${filename}"`;
+      navigator.clipboard.writeText(snippet).then(() => {
+        actions.setError(`Copied: ${snippet} — use this path in your Manim code`);
+      });
+    },
+
     addAssetToStage(assetId) {
       const obj = actions.addImageObject(assetId);
       if (obj) actions.selectObject(obj.id);
@@ -268,6 +299,13 @@ export default {
 .asset-remove {
   @apply absolute -top-1 -right-1 w-4 h-4 rounded-full bg-studio-error text-white text-[10px] leading-none;
   @apply flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity;
+}
+.asset-copy-path {
+  @apply absolute bottom-0.5 right-0.5 w-5 h-5 rounded bg-studio-accent text-white;
+  @apply flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity;
+  font-size: 8px;
+  border: none;
+  cursor: pointer;
 }
 
 .btn-transform {

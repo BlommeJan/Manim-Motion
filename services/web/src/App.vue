@@ -7,8 +7,8 @@
     <div class="flex-1 flex overflow-hidden min-h-0">
       <AssetSidebar />
       <div class="flex-1 min-w-0 flex flex-col relative" style="background: var(--studio-bg);">
-        <!-- Stage / Code toggle pill -->
-        <div class="absolute top-2.5 right-2.5 z-20 flex items-center backdrop-blur-sm rounded-lg p-0.5" style="background: var(--studio-surface3); border: 1px solid var(--studio-border);">
+        <!-- Stage / Code toggle pill (hidden in code-only mode) -->
+        <div v-if="!isCodeMode" class="absolute top-2.5 right-2.5 z-20 flex items-center backdrop-blur-sm rounded-lg p-0.5" style="background: var(--studio-surface3); border: 1px solid var(--studio-border);">
           <button
             class="stage-tab-btn" :class="{ active: stageViewMode === 'canvas' }"
             @click="stageViewMode = 'canvas'"
@@ -24,22 +24,27 @@
             Code
           </button>
         </div>
+        <!-- Code-only mode badge -->
+        <div v-if="isCodeMode" class="absolute top-2.5 right-2.5 z-20 flex items-center backdrop-blur-sm rounded-lg px-3 py-1" style="background: var(--studio-surface3); border: 1px solid var(--studio-border);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px;"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span class="text-[10px] font-semibold" style="color: var(--studio-accent);">Code Only</span>
+        </div>
 
-        <!-- Canvas view -->
-        <StageCanvas v-show="stageViewMode === 'canvas'" />
+        <!-- Canvas view (hidden in code-only mode) -->
+        <StageCanvas v-show="stageViewMode === 'canvas' && !isCodeMode" />
 
         <!-- Code view -->
-        <div v-show="stageViewMode === 'code'" class="flex-1 flex flex-col overflow-hidden rounded-xl m-0" style="background: var(--studio-surface);">
+        <div v-show="stageViewMode === 'code' || isCodeMode" class="flex-1 flex flex-col overflow-hidden rounded-xl m-0" style="background: var(--studio-surface);">
           <!-- Code toolbar -->
           <div class="flex items-center gap-2 px-4 py-2.5 flex-shrink-0" style="border-bottom: 1px solid var(--studio-divider);">
             <span class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--studio-text-muted);">Manim Scene</span>
-            <span v-if="codeEdited" class="text-[9px] px-1.5 py-0.5 rounded font-medium" style="background: rgb(var(--c-warning) / 0.2); color: var(--studio-warning);">edited</span>
+            <span v-if="codeEdited && !isCodeMode" class="text-[9px] px-1.5 py-0.5 rounded font-medium" style="background: rgb(var(--c-warning) / 0.2); color: var(--studio-warning);">edited</span>
             <div class="flex-1"></div>
-            <button v-if="codeEdited" class="code-stage-btn apply-btn" @click="applyCodeToCanvas" title="Parse this code and update the canvas">
+            <button v-if="codeEdited && !isCodeMode" class="code-stage-btn apply-btn" @click="applyCodeToCanvas" title="Parse this code and update the canvas">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
               Apply to Canvas
             </button>
-            <button v-if="codeEdited" class="code-stage-btn" @click="resetCode" title="Discard edits and regenerate">
+            <button v-if="codeEdited && !isCodeMode" class="code-stage-btn" @click="resetCode" title="Discard edits and regenerate">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
               Reset
             </button>
@@ -74,19 +79,20 @@
           </div>
           <!-- Footer -->
           <div class="flex items-center justify-between px-4 py-2 flex-shrink-0" style="border-top: 1px solid var(--studio-divider);">
-            <span v-if="parseMessage" class="text-[10px]" :style="parseMessageOk ? 'color: var(--studio-success)' : 'color: var(--studio-danger)'">{{ parseMessage }}</span>
+            <span v-if="parseMessage && !isCodeMode" class="text-[10px]" :style="parseMessageOk ? 'color: var(--studio-success)' : 'color: var(--studio-danger)'">{{ parseMessage }}</span>
+            <span v-else-if="isCodeMode" class="text-[10px]" style="color: var(--studio-text-muted); opacity: 0.5;">Write any valid Manim code and render directly</span>
             <span v-else class="text-[10px]" style="color: var(--studio-text-muted); opacity: 0.5;">Edit the code, then "Apply to Canvas" to update objects</span>
-            <button class="text-[10px] transition-colors" style="color: var(--studio-accent);" @click="stageViewMode = 'canvas'">
+            <button v-if="!isCodeMode" class="text-[10px] transition-colors" style="color: var(--studio-accent);" @click="stageViewMode = 'canvas'">
               ← Back to Canvas
             </button>
           </div>
         </div>
       </div>
-      <PropertiesPanel />
+      <PropertiesPanel v-if="!isCodeMode" />
     </div>
 
-    <!-- Bottom Timeline -->
-    <Timeline />
+    <!-- Bottom Timeline (hidden in code-only mode) -->
+    <Timeline v-if="!isCodeMode" />
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- Export Dialog (client-side .py download) -->
@@ -239,6 +245,7 @@
               >
                 <div class="flex-1 cursor-pointer min-w-0" @click="openServerProject(p.id)">
                   <span class="text-sm font-medium text-studio-text">{{ p.name }}</span>
+                  <span v-if="p.editorMode === 'code'" class="text-[9px] px-1.5 py-0.5 rounded font-semibold ml-2" style="background: var(--studio-accent-subtle); color: var(--studio-accent);">CODE</span>
                   <span class="text-[10px] text-studio-text-muted ml-2">{{ p.objectsCount || 0 }} objects</span>
                   <span class="text-[9px] text-studio-text-muted font-mono ml-2 hidden group-hover:inline">{{ p.id }}</span>
                 </div>
@@ -316,6 +323,7 @@ export default {
 
   computed: {
     store()              { return store; },
+    isCodeMode()         { return store.project.editorMode === 'code'; },
     error()              { return store.error; },
     showExport()         { return store.showExportDialog; },
     exportCode()         { return store.exportCode; },
@@ -356,12 +364,22 @@ export default {
 
   watch: {
     'store.project.objects': {
-      handler() { if (this.stageViewMode === 'code' && !this.codeEdited) this._debouncedUpdateCode(); },
+      handler() { if (!this.isCodeMode && this.stageViewMode === 'code' && !this.codeEdited) this._debouncedUpdateCode(); },
       deep: true
     },
     'store.project.tracks': {
-      handler() { if (this.stageViewMode === 'code' && !this.codeEdited) this._debouncedUpdateCode(); },
+      handler() { if (!this.isCodeMode && this.stageViewMode === 'code' && !this.codeEdited) this._debouncedUpdateCode(); },
       deep: true
+    },
+    'store.project.editorMode': {
+      handler(mode) {
+        if (mode === 'code') {
+          this.stageViewMode = 'code';
+          this.stageCode = store.project.codeSource || '';
+          this.codeEdited = false;
+        }
+      },
+      immediate: true
     }
   },
 
@@ -421,7 +439,19 @@ export default {
 
     // ── Export dialog ──
     closeExport() { store.showExportDialog = false; },
-    downloadPy() { downloadManimScript(store.project); },
+    downloadPy() {
+      if (this.isCodeMode) {
+        const blob = new Blob([store.exportCode], { type: 'text/x-python' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${store.project.name || 'scene'}.py`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        downloadManimScript(store.project);
+      }
+    },
     copyCode() {
       navigator.clipboard.writeText(store.exportCode).then(() => {
         this.copied = true;
@@ -477,7 +507,11 @@ export default {
       this.stageViewMode = 'code';
       this.codeEdited = false;
       this.parseMessage = '';
-      this.updateStageCode();
+      if (this.isCodeMode) {
+        this.stageCode = store.project.codeSource || '';
+      } else {
+        this.updateStageCode();
+      }
       this.$nextTick(() => this.syncCodeScroll());
     },
     updateStageCode() {
@@ -507,7 +541,12 @@ export default {
     },
     onCodeInput(e) {
       this.stageCode = e.target.value;
-      this.codeEdited = true;
+      if (this.isCodeMode) {
+        store.project.codeSource = this.stageCode;
+        store.isDirty = true;
+      } else {
+        this.codeEdited = true;
+      }
     },
     resetCode() {
       this.codeEdited = false;
@@ -555,7 +594,17 @@ export default {
       });
     },
     downloadStageCode() {
-      downloadManimScript(store.project);
+      if (this.isCodeMode) {
+        const blob = new Blob([this.stageCode], { type: 'text/x-python' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${store.project.name || 'scene'}.py`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        downloadManimScript(store.project);
+      }
     },
 
     // ── Error ──

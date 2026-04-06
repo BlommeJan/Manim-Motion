@@ -4,7 +4,8 @@
   # Manim Motion Editor
   
   **A Figma-like visual animation editor powered by Manim.**  
-  Build mathematical animations by dragging shapes, writing LaTeX, creating morphs, and rendering cinematic videos -- all from your browser.
+  Build mathematical animations by dragging shapes, writing LaTeX, creating morphs, and rendering cinematic videos -- all from your browser.  
+  Or switch to **Code-Only mode** and write raw Manim Python with full library access.
 </div>
 
 <br>
@@ -15,7 +16,7 @@
   <img src="https://img.shields.io/badge/manim-CE-orange?logo=python&logoColor=white" alt="Manim">
   <img src="https://img.shields.io/badge/node-20-339933?logo=node.js&logoColor=white" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
-  <img src="https://img.shields.io/badge/version-1.0.1-6B7280" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.0-6B7280" alt="Version">
 </p>
 
 ---
@@ -39,6 +40,11 @@ Screenshots are stored in `docs/screenshots/`. Replace or add PNGs there and upd
 
 ## Features
 
+### Dual Editor Modes
+- **Visual (UI) mode** -- Figma-style drag-and-drop canvas with shapes, timeline, and animations
+- **Code-Only mode** -- Write raw Manim Python directly; full library access, no visual limitations; errors streamed back from the renderer
+- **New Project wizard** -- Choose name and mode (Visual / Code) when creating a project; mode is saved with the project
+
 ### Visual Editor
 - **Drag-and-drop stage** -- Canvas with optional grid, resize/rotate handles, multi-select, snapping; background color and opacity configurable in the Properties panel (no selection)
 - **Light & Dark themes** -- Toggle between warm light and sleek dark palettes via View > Theme; persists across sessions
@@ -54,6 +60,13 @@ Screenshots are stored in `docs/screenshots/`. Replace or add PNGs there and upd
 - **Animation types** -- Transform, Move, Scale, Fade, Rotate with 17 easing functions
 - **Timeline scrubbing** -- Arrange and trim clips; render to video via Docker
 - **Entrance / exit animations** -- 11 entrance and 9 exit animation presets per object
+
+### Code-Only Editor
+- **Full Manim power** -- Write any valid Manim code (imports, custom classes, 3D scenes) and render it directly
+- **Syntax-highlighted editor** -- Python code editing with highlight.js; same familiar UI chrome as visual mode
+- **Asset integration** -- Upload images/SVGs in the sidebar; click to copy the file path for use in your code
+- **Direct render** -- Code is written as `scene.py` and executed by the Manim worker; full stdout/stderr visible in the render dialog
+- **Error feedback** -- Manim tracebacks and compilation errors are shown in the render log panel
 
 ### Workflow
 - **Undo / Redo** -- Full history stack (Ctrl+Z / Ctrl+Shift+Z) with 50-state memory
@@ -327,7 +340,7 @@ npm test
 
 ---
 
-## Tech Stack
+## Tech Stack![1775491376876](image/README/1775491376876.png)![1775491379141](image/README/1775491379141.png)![1775491380665](image/README/1775491380665.png)![1775491383028](image/README/1775491383028.png)
 
 - **Frontend**: Vue 2.7, Konva.js, Tailwind CSS (with CSS-variable theming), Vite
 - **Backend**: Node.js 20, Express, Multer, Zod, Redis
@@ -344,7 +357,16 @@ For detailed technical docs of the entire codebase, see **[XTRA-BIG-README.md](X
 
 ## Changelog
 
-### v1.0.1 (current)
+### v1.1.0 (current)
+
+- **Feature**: Dual editor modes -- choose **Visual (UI)** or **Code Only** when creating a new project
+- **Feature**: Code-Only mode provides full Manim library access; write raw Python, render directly, see errors in-app
+- **Feature**: New Project dialog with name input and mode selection (Visual / Code)
+- **Feature**: Asset sidebar shows "copy path" helper in code mode for easy file references
+- **Feature**: Dedicated `POST /api/projects/:id/render-code` endpoint for raw Manim source rendering
+- **Data model**: Projects now include `editorMode` and `codeSource` fields; backward-compatible with existing projects (default to `visual`)
+
+### v1.0.1
 
 - **Fix**: Corrected `git clone` command in README to use the actual repository URL and correct directory name
 

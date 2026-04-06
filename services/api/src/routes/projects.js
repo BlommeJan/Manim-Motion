@@ -47,7 +47,7 @@ router.post('/', async (req, res, next) => {
   try {
     // Sanitize input to prevent NoSQL injection
     const sanitizedBody = sanitizeNoSQL(req.body);
-    const { name = 'My Animation' } = sanitizedBody;
+    const { name = 'My Animation', editorMode = 'visual', codeSource = '' } = sanitizedBody;
     const projectId = `proj_${uuidv4().split('-')[0]}`;
 
     const projectDir = getProjectDir(req.dataDir, projectId);
@@ -56,6 +56,8 @@ router.post('/', async (req, res, next) => {
     const project = {
       id: projectId,
       name,
+      editorMode,
+      codeSource,
       stage: {
         width: 1920,
         height: 1080,
@@ -112,6 +114,7 @@ router.get('/', async (req, res, next) => {
         projects.push({
           id: project.id,
           name: project.name,
+          editorMode: project.editorMode || 'visual',
           objectsCount: project.objects?.length || 0,
           tracksCount: project.tracks?.length || 0,
           updatedAt: stat.mtime.toISOString()
@@ -257,6 +260,50 @@ router.post('/:id/render', async (req, res, next) => {
       jobId,
       status: 'queued',
       message: 'Render job enqueued'
+    });
+  } catch (err) {
+    if (err.code === 'ENOENT') return res.status(404).json({ error: 'Project not found' });
+    next(err);
+  }
+});
+
+// ─── RENDER CODE (raw Manim source) ───────────────────────────────────────────
+
+/**
+ * POST /api/projects/:id/render-code
+ * Write raw user-supplied Manim code as scene.py and enqueue a render job.
+ */
+router.post('/:id/render-code', async (req, res, next) => {
+  try {
+    const { quality = 'medium', codeSource, sceneName = 'MainScene' } = req.body;
+    const projectId = req.params.id;
+
+    if (!codeSource || typeof codeSource !== 'string' || codeSource.trim().length === 0) {
+      return res.status(400).json({ error: 'codeSource is required and must be non-empty' });
+    }
+
+    const projectDir = getProjectDir(req.dataDir, projectId);
+    await fs.mkdir(projectDir, { recursive: true, mode: 0o777 });
+
+    const scenePath = path.join(projectDir, 'scene.py');
+    await fs.writeFile(scenePath, codeSource);
+
+    console.log(`[API] code-mode scene.py written for ${projectId} (${codeSource.length} bytes)`);
+
+    const jobId = `job_${uuidv4().split('-')[0]}`;
+
+    await enqueueRenderJob({
+      jobId,
+      projectId,
+      sceneFile: `projects/${projectId}/scene.py`,
+      sceneName,
+      quality
+    });
+
+    res.status(202).json({
+      jobId,
+      status: 'queued',
+      message: 'Code render job enqueued'
     });
   } catch (err) {
     if (err.code === 'ENOENT') return res.status(404).json({ error: 'Project not found' });

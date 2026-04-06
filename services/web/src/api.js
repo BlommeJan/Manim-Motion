@@ -36,10 +36,10 @@ export const projects = {
 
   get: (id) => request(`/projects/${id}`),
 
-  create: (name = 'My Animation') =>
+  create: (name = 'My Animation', editorMode = 'visual') =>
     request('/projects', {
       method: 'POST',
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ name, editorMode })
     }),
 
   update: (id, project) =>
@@ -55,6 +55,12 @@ export const projects = {
     request(`/projects/${id}/render`, {
       method: 'POST',
       body: JSON.stringify({ quality })
+    }),
+
+  renderCode: (id, { quality = 'high', codeSource, sceneName = 'MainScene' }) =>
+    request(`/projects/${id}/render-code`, {
+      method: 'POST',
+      body: JSON.stringify({ quality, codeSource, sceneName })
     })
 };
 

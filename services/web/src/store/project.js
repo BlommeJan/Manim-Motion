@@ -17,10 +17,21 @@ const MAX_HISTORY = 50;
 
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
-function createDefaultProject() {
+const CODE_MODE_TEMPLATE = `from manim import *
+
+class MainScene(Scene):
+    def construct(self):
+        text = Text("Hello, Manim!")
+        self.play(Write(text))
+        self.wait()
+`;
+
+function createDefaultProject(editorMode = 'visual') {
   return {
     id: null,
     name: 'My Animation',
+    editorMode,          // 'visual' | 'code'
+    codeSource: editorMode === 'code' ? CODE_MODE_TEMPLATE : '',
     stage: {
       width: 1920,
       height: 1080,
@@ -639,6 +650,8 @@ export const actions = {
       if (!data.tracks) data.tracks = [{ id: 'track_1', name: 'Track 1', clips: [] }];
       if (!data.assets) data.assets = [];
       if (!data.groups) data.groups = [];
+      if (!data.editorMode) data.editorMode = 'visual';
+      if (data.codeSource === undefined) data.codeSource = '';
       store.project = data;
       store.selectedObjectIds = [];
       store.selectedClipId = null;
@@ -683,8 +696,8 @@ export const actions = {
     });
   },
 
-  newProject(name = 'My Animation') {
-    store.project = createDefaultProject();
+  newProject(name = 'My Animation', editorMode = 'visual') {
+    store.project = createDefaultProject(editorMode);
     store.project.name = name;
     store.selectedObjectIds = [];
     store.selectedClipId = null;
@@ -731,7 +744,7 @@ export const actions = {
     try {
       // 1. Create on server if no project ID
       if (!store.project.id) {
-        const created = await api.projects.create(store.project.name);
+        const created = await api.projects.create(store.project.name, store.project.editorMode);
         Vue.set(store.project, 'id', created.id);
       }
 
@@ -795,6 +808,8 @@ export const actions = {
 
       // Ensure groups array exists
       if (!project.groups) project.groups = [];
+      if (!project.editorMode) project.editorMode = 'visual';
+      if (project.codeSource === undefined) project.codeSource = '';
 
       store.project = project;
       store.selectedObjectIds = [];
@@ -859,9 +874,18 @@ export const actions = {
       store.renderStatus = 'saving';
       const projectId = await actions.saveToServer();
 
-      // 2. Trigger render
+      // 2. Trigger render (code mode sends raw source; visual mode uses compiled pipeline)
       store.renderStatus = 'queued';
-      const result = await api.projects.render(projectId, quality);
+      let result;
+      if (store.project.editorMode === 'code') {
+        result = await api.projects.renderCode(projectId, {
+          quality,
+          codeSource: store.project.codeSource,
+          sceneName: 'MainScene'
+        });
+      } else {
+        result = await api.projects.render(projectId, quality);
+      }
       store.renderJobId = result.jobId;
 
       // 3. Start polling

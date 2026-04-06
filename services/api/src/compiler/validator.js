@@ -76,6 +76,8 @@ const TrackSchema = z.object({
 const ProjectSchema = z.object({
   id: z.string().nullable().default(null),
   name: z.string().default('My Animation'),
+  editorMode: z.enum(['visual', 'code']).default('visual'),
+  codeSource: z.string().default(''),
   stage: StageSchema,
   assets: z.array(AssetSchema).default([]),
   objects: z.array(ObjectSchema).default([]),

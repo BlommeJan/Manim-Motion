@@ -52,8 +52,12 @@ def render_job(payload: dict) -> dict:
     scene_name = payload.get("sceneName", "MainScene")
     quality = payload.get("quality", "medium")
     
-    # Paths
-    scene_file = os.path.join(DATA_DIR, "projects", project_id, "scene.py")
+    # Paths — honor explicit sceneFile from payload if provided
+    relative_scene = payload.get("sceneFile")
+    if relative_scene:
+        scene_file = os.path.join(DATA_DIR, relative_scene)
+    else:
+        scene_file = os.path.join(DATA_DIR, "projects", project_id, "scene.py")
     media_dir = os.path.join(DATA_DIR, "renders", project_id)
     latest_link = os.path.join(media_dir, "latest.mp4")
     
